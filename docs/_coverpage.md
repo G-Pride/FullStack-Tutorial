@@ -1,12 +1,9 @@
-![logo](_media/icon.svg)
+# FullStack Tutorial
 
-# docsify
+> 全栈开发指南，架构师成长之路
 
-> A magical documentation site generator.
+* Focus on！
 
-* Simple and lightweight (~12kb gzipped)
-* Multiple themes
-* Not build static html files
+[GitHub](https://github.com/G-Pride/FullStack-Tutorial)
+[Get Started](#/)
 
-[GitHub](https://github.com/docsifyjs/docsify/)
-[Get Started](#quick-start)
