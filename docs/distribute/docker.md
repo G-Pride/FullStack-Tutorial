@@ -2,7 +2,7 @@
 
 # Docker 简介
 
-## **1.什么是Docker**
+## **1. 什么是Docker**
 
 Docker 最初是 dotCloud 公司创始人 Solomon Hykes 在法国期间发起的一个公司内部项目，它是基于 dotCloud 公司多年云服务技术的一次革新，并于 [2013 年 3 月以 Apache 2.0 授权协议开源](https://en.wikipedia.org/wiki/Docker_(software))，主要项目代码在 [GitHub](https://github.com/moby/moby) 上进行维护。Docker 项目后来还加入了 Linux 基金会，并成立推动 [开放容器联盟（OCI）](https://www.opencontainers.org/)。
 
@@ -18,7 +18,7 @@ Docker 在容器的基础上，进行了进一步的封装，从文件系统、�
 
 ![](.\images\docker.png)
 
-## **2.为什么使用Docker**
+## **2. 为什么使用Docker**
 
 作为一种新兴的虚拟化方式，Docker 跟传统的虚拟化方式相比具有众多的优势。
 
@@ -59,7 +59,7 @@ Docker 使用的分层存储以及镜像的技术，使得应用重复部分的�
 | 性能       | 接近原生           | 弱于        |
 | 系统支持量 | 单机支持上千个容器 | 一般几十个  |
 
-## 3.Docker基本概念
+## 3. Docker基本概念
 
 Docker 包括三个基本概念
 
@@ -69,7 +69,7 @@ Docker 包括三个基本概念
 
 理解了这三个概念，就理解了 Docker 的整个生命周期。
 
-### 3.1Docker引擎
+### 3.1 Docker引擎
 
 Docker 引擎是一个包含以下主要组件的客户端服务器应用程序。
 
@@ -81,7 +81,7 @@ Docker 引擎组件的流程如下图所示：
 
 ![](.\images\620140640_31678.png)
 
-### 3.2Docker架构
+### 3.2 Docker架构
 
 Docker 使用客户端-服务器 (C/S) 架构模式，使用远程 API 来管理和创建 Docker 容器。
 
@@ -105,7 +105,7 @@ Docker 容器通过 Docker 镜像来创建。
 | **仓库**(Registry)  | Docker 仓库用来保存镜像，可以理解为代码控制中的代码仓库。Docker Hub([https://hub.docker.com](https://hub.docker.com/)) 提供了庞大的镜像集合供使用。 |
 | **Docker Machine**  | Docker Machine是一个简化Docker安装的命令行工具，通过一个简单的命令行即可在相应的平台上安装Docker，比如VirtualBox、 Digital Ocean、Microsoft Azure。 |
 
-### 3.3Docker镜像
+### 3.3 Docker镜像
 
 我们都知道，操作系统分为内核和用户空间。对于 Linux 而言，内核启动后，会挂载 `root` 文件系统为其提供用户空间支持。而 Docker 镜像（Image），就相当于是一个 `root` 文件系统。比如官方镜像 `ubuntu:16.04` 就包含了完整的一套 Ubuntu 16.04 最小系统的 `root` 文件系统。
 
@@ -121,7 +121,7 @@ Docker 镜像是一个特殊的文件系统，除了提供容器运行时所需�
 
 关于镜像构建，将会在后续相关章节中做进一步的讲解。
 
-### 3.4Docker容器
+### 3.4 Docker容器
 
 镜像（`Image`）和容器（`Container`）的关系，就像是面向对象程序设计中的 `类` 和 `实例` 一样，镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。
 
@@ -135,7 +135,7 @@ Docker 镜像是一个特殊的文件系统，除了提供容器运行时所需�
 
 数据卷的生存周期独立于容器，容器消亡，数据卷不会消亡。因此，使用数据卷后，容器删除或者重新运行之后，数据却不会丢失。
 
-### 3.5Docker仓库
+### 3.5 Docker仓库
 
 镜像构建完成后，可以很容易的在当前宿主机上运行，但是，如果需要在其它服务器上使用这个镜像，我们就需要一个集中的存储、分发镜像的服务，`Docker Registry` 就是这样的服务。
 
@@ -167,9 +167,9 @@ Docker Registry 公开服务是开放给用户使用、允许用户管理镜像�
 
 
 
-## 4.安装
+## 4. 安装
 
-### 4.1Linux安装
+### 4.1 Linux安装
 
 *注：命令需要用到yum，如有把python2升级为python3的，像/usr/bin/yum、/bin/yum、/bin/yum-config-manager这些文件的开头都要改成对应的python2的版本号。*
 
@@ -193,11 +193,59 @@ sudo usermod -aG docker xxx
 
 ![](.\images\123.png)
 
+## 5. 客户端命令
 
+可以通过 `docker COMMAND --help` 来查看这些命令的具体用法。
 
+- `attach`：依附到一个正在运行的容器中；
+- `build`：从一个 Dockerfile 创建一个镜像；
+- `commit`：从一个容器的修改中创建一个新的镜像；
+- `cp`：在容器和本地宿主系统之间复制文件中；
+- `create`：创建一个新容器，但并不运行它；
+- `diff`：检查一个容器内文件系统的修改，包括修改和增加；
+- `events`：从服务端获取实时的事件；
+- `exec`：在运行的容器内执行命令；
+- `export`：导出容器内容为一个 `tar` 包；
+- `history`：显示一个镜像的历史信息；
+- `images`：列出存在的镜像；
+- `import`：导入一个文件（典型为 `tar` 包）路径或目录来创建一个本地镜像；
+- `info`：显示一些相关的系统信息；
+- `inspect`：显示一个容器的具体配置信息；
+- `kill`：关闭一个运行中的容器 (包括进程和所有相关资源)；
+- `load`：从一个 tar 包中加载一个镜像；
+- `login`：注册或登录到一个 Docker 的仓库服务器；
+- `logout`：从 Docker 的仓库服务器登出；
+- `logs`：获取容器的 log 信息；
+- `network`：管理 Docker 的网络，包括查看、创建、删除、挂载、卸载等；
+- `node`：管理 swarm 集群中的节点，包括查看、更新、删除、提升/取消管理节点等；
+- `pause`：暂停一个容器中的所有进程；
+- `port`：查找一个 nat 到一个私有网口的公共口；
+- `ps`：列出主机上的容器；
+- `pull`：从一个Docker的仓库服务器下拉一个镜像或仓库；
+- `push`：将一个镜像或者仓库推送到一个 Docker 的注册服务器；
+- `rename`：重命名一个容器；
+- `restart`：重启一个运行中的容器；
+- `rm`：删除给定的若干个容器；
+- `rmi`：删除给定的若干个镜像；
+- `run`：创建一个新容器，并在其中运行给定命令；
+- `save`：保存一个镜像为 tar 包文件；
+- `search`：在 Docker index 中搜索一个镜像；
+- `service`：管理 Docker 所启动的应用服务，包括创建、更新、删除等；
+- `start`：启动一个容器；
+- `stats`：输出（一个或多个）容器的资源使用统计信息；
+- `stop`：终止一个运行中的容器；
+- `swarm`：管理 Docker swarm 集群，包括创建、加入、退出、更新等；
+- `tag`：为一个镜像打标签；
+- `top`：查看一个容器中的正在运行的进程信息；
+- `unpause`：将一个容器内所有的进程从暂停状态中恢复；
+- `update`：更新指定的若干容器的配置信息；
+- `version`：输出 Docker 的版本信息；
+- `volume`：管理 Docker volume，包括查看、创建、删除等；
+- `wait`：阻塞直到一个容器终止，然后输出它的退出符。
 
+## 一张图总结 Docker 的命令
 
-
+![](.\images\cmd_logic.png)
 
 
 
