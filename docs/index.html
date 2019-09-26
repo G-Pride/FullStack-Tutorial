@@ -14,10 +14,22 @@
     window.$docsify = {
       coverpage: true,
       loadSidebar: true,
-      maxLevel: 3,
       name: 'FullStack Tutorial',
       repo: 'https://github.com/G-Pride/FullStack-Tutorial',
-      notFoundPage: true
+      notFoundPage: true,
+      alias: {
+          '.*?/changelog': 'https://unpkg.com/docsify-themeable/CHANGELOG.md',
+      },
+      auto2top: true,
+      maxLevel: 3,
+      subMaxLevel: 2,
+      executeScript: true,
+      ga: 'UA-100100910-3',
+      search: {
+          depth: 6,
+          noData: 'No results!',
+          placeholder: 'Search ...'
+      }
     }
   </script>
   <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
