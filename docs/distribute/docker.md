@@ -12,9 +12,9 @@ Docker 在容器的基础上，进行了进一步的封装，从文件系统、�
 
 下面的图片比较了 Docker 和传统虚拟化方式的不同之处。传统虚拟机技术是虚拟出一套硬件后，在其上运行一个完整操作系统，在该系统上再运行所需应用进程；而容器内的应用进程直接运行于宿主的内核，容器内没有自己的内核，而且也没有进行硬件虚拟。因此容器要比传统虚拟机更为轻便。
 
-![](E:\GitHubResp\FullStack-Tutorial\docs\distribute\images\virtualization.png)
+![](.\images\virtualization.png)
 
-![](E:\GitHubResp\FullStack-Tutorial\docs\distribute\images\docker.png)
+![](.\images\docker.png)
 
 ## **2.为什么使用Docker**
 
@@ -77,7 +77,7 @@ Docker 引擎是一个包含以下主要组件的客户端服务器应用程序�
 
 Docker 引擎组件的流程如下图所示：
 
-![](E:\GitHubResp\FullStack-Tutorial\docs\distribute\images\620140640_31678.png)
+![](.\images\620140640_31678.png)
 
 ### 3.2Docker架构
 
@@ -92,7 +92,7 @@ Docker 容器通过 Docker 镜像来创建。
 | 容器   | 对象     |
 | 镜像   | 类       |
 
-![](E:\GitHubResp\FullStack-Tutorial\docs\distribute\images\262150629_86976.png)
+![](.\images\262150629_86976.png)
 
 | 标题                | 说明                                                         |
 | :------------------ | :----------------------------------------------------------- |
@@ -179,7 +179,7 @@ sudo wget -qO- https://get.docker.com | sh
 
 安装成功如下所示：
 
-![](E:\GitHubResp\FullStack-Tutorial\docs\distribute\images\clipboard.png)
+![](.\images\clipboard.png)
 
 将子用户xxx加入docker组，这样不是root用户也可以运行docker
 
@@ -189,4 +189,4 @@ sudo usermod -aG docker xxx
 
 在子用户下测试权限：docker version
 
-![](E:\GitHubResp\FullStack-Tutorial\docs\distribute\images\123.png)
+![](.\images\123.png)
