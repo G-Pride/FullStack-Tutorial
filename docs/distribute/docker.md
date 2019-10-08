@@ -308,6 +308,6 @@ ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/jar包名"
 查看日志
 
 ```
-docker logs -f [-t=行数] 容器id
+docker logs -f  容器id
 ```
 
