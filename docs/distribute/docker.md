@@ -247,5 +247,67 @@ sudo usermod -aG docker xxx
 
 ![](.\images\cmd_logic.png)
 
+## 6、应用部署
 
+### 6.1Tomcat启动
+
+从[镜像仓库](https://c.163yun.com/hub#/home)获取tomcat镜像：
+
+```
+docker pull 镜像名
+```
+
+查看镜像
+
+```
+docker images
+```
+
+新建文件夹，放入应用war包还有新建Dockerfile文件（vi Dockerfile），内容如下：
+
+```
+FORM 镜像名
+CPOPY war包名 存放路径
+```
+
+自定义镜像
+
+```
+docker build -t 镜像名:标签 .
+```
+
+运行镜像
+
+```
+docker run -d -p 8888:8080 镜像名:标签
+```
+
+查看运行容器
+
+```
+docker ps
+```
+
+进入容器内
+
+```
+docker exec -it 容器id bash
+```
+
+### 6.2 spring boot应用启动
+
+新建文件夹，放入应用war包还有新建Dockerfile文件（vi Dockerfile），内容如下：
+
+```
+FROM java:8 
+VOLUME /tmp 
+ADD jar包名 /jar包名
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/jar包名"]
+```
+
+查看日志
+
+```
+docker logs -f [-t=行数] 容器id
+```
 
