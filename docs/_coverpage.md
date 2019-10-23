@@ -5,5 +5,5 @@
 * Focus on！
 
 [GitHub](https://github.com/G-Pride/FullStack-Tutorial)
-[Get Started](../README)
+[Get Started](/README)
 
