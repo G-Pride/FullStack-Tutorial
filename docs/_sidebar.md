@@ -1,6 +1,6 @@
 - 后端开发
 
-  - [Java](/be/Java/JavaBar)
+  - [Java](/beDev/Java/JavaBar)
   - Spring Cloud
   - Python
 - 云计算&大数据
@@ -8,16 +8,20 @@
   - Zookeeper
   - Kafka
   - Storm
-  - [Docker](/cb/Docker/docker)
+  - [Docker](/bigData/Docker/docker)
   - Spark
   - Kubernetes
   - Hbase
 - 数据库
-  - [Redis](/data/Redis/redis)
+  - [Redis](/dataBase/Redis/redis)
   - SQL
   - MongoDB
-
 - 计算机基础
   - [Linux](/algorithm/Linux/linux)
   - 操作系统原理
   - 算法与数据结构
+- 人工智能
+  - 区块链
+  - 机器学习
+  - 深度学习
+  - 数据分析&挖掘
