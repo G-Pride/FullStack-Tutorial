@@ -8,16 +8,16 @@
   - Zookeeper
   - Kafka
   - Storm
-  - [Docker](/cb/Docker/Docker)
+  - [Docker](/cb/Docker/docker)
   - Spark
   - Kubernetes
   - Hbase
 - 数据库
-  - [Redis](/data/Redis/Redis)
+  - [Redis](/data/Redis/redis)
   - SQL
   - MongoDB
 
 - 计算机基础
-  - [Linux](/algorithm/Linux/Linux)
+  - [Linux](/algorithm/Linux/linux)
   - 操作系统原理
   - 算法与数据结构
