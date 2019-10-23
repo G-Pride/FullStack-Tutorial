@@ -1,8 +1,6 @@
 - 后端开发
 
-  - Java
-    - Java 基础
-    - Java 设计模式
+  - [Java](#/be/Java/JavaBar.md)
   - Spring Cloud
   - Python
 - 云计算&大数据
