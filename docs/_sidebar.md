@@ -1,6 +1,6 @@
 - 后端开发
 
-  - [Java](#/be/Java/JavaBar.md)
+  - [Java](/be/Java/JavaBar)
   - Spring Cloud
   - Python
 - 云计算&大数据
@@ -21,6 +21,3 @@
   - Linux
   - 操作系统原理
   - 算法与数据结构
-
-
-
