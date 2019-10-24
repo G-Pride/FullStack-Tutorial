@@ -8,7 +8,7 @@
   - Zookeeper
   - Kafka
   - Storm
-  - [Docker](/bigData/Docker/docker)
+  - [Docker](/bigData/Docker/Docker)
   - Spark
   - Kubernetes
   - Hbase
@@ -17,7 +17,7 @@
   - SQL
   - MongoDB
 - 计算机基础
-  - [Linux](/algorithm/Linux/linux)
+  - [Linux](/algorithm/Linux/Linux)
   - 操作系统原理
   - 算法与数据结构
 - 人工智能

@@ -754,7 +754,7 @@ redis配置文件使用`#######################`被分成了几大块区域,
 
 ------
 
-- logfile ""
+- logfile 
 
 配置log文件地址,默认值为stdout。若后台模式会输出到/dev/null("黑洞"); （可以自定义配置：/var/log/redis/redis.log）
 
