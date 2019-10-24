@@ -13,7 +13,7 @@
   - Kubernetes
   - Hbase
 - 数据库
-  - [Redis](/dataBase/Redis/redis)
+  - [Redis](/dataBase/Redis/Redis)
   - SQL
   - MongoDB
 - 计算机基础
