@@ -48,7 +48,7 @@ broker.id=2
    ```
 broker.id=3
    
-#搭建集群必须指定，不然默认指向9092
+   #搭建集群必须指定，不然默认指向9092
    port=9093
    
    log.dirs=/home/appuser/kafka/kafka_2.12-2.0.0/log3
@@ -57,7 +57,7 @@ broker.id=3
    zookeeper.connect=127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183
    ```
    
-   *log1~3文件夹不存在，需要手动创建*
+    *log1~3文件夹不存在，需要手动创建*
    
 4. 进入kafka_2.12-2.0.0/目录，vi kafka-start-all.sh
 
@@ -67,5 +67,5 @@ broker.id=3
    ./bin/kafka-server-start.sh ./config/server2.properties &
    ```
 
-**注意：要确保9091~9093跟2181~2183能成功联通。**
+ **注意：要确保9091~9093跟2181~2183每个嘛端口都有开通，非单机要注意外网ip能否ping通。**
 
