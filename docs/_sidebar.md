@@ -5,8 +5,8 @@
   - Python
 - 云计算&大数据
   - Hadoop
-  - Zookeeper
-  - Kafka
+  - [Zookeeper](/bigData/Zookeeper/Zookeeper)
+  - [Kafka](/bigData/Kafka/Kafka)
   - Storm
   - [Docker](/bigData/Docker/Docker)
   - Spark
