@@ -18,3 +18,6 @@ QQ邮箱：493536604@qq.com
 
 GitHub地址： https://github.com/G-Pride 
 
+微信：															
+
+![](./images/code.jpg)
