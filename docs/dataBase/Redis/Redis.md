@@ -1,3 +1,132 @@
+# Redis 5.0.5 
+
+## 安装
+
+步骤：
+
+- 安装源码包
+
+  ```
+  yum -y install make gcc*
+  ```
+
+- 下载包
+
+  ```
+  wget http://download.redis.io/releases/redis-5.0.5.tar.gz
+  ```
+
+- 解压安装
+
+  ```
+  tar zvxf redis-5.0.5.tar.gz
+  cd redis-5.0.5
+  make
+  ```
+
+  `会报错：`
+
+  `In file included from adlist.c:34:0:`
+
+  `zmalloc.h:50:31: fatal error: jemalloc/jemalloc.h: No such file or directory`
+
+  ```
+  make MALLOC=libc
+  
+  #也可以不加PREFIX，这就默认将程序装在/usr/local/bin/目录下，这样可以在任意地方，而不用到指定目录下调用redis命令，这里我安装到自定义目录下
+  make install PREFIX =/home/appuser/redis/redis-cluster 
+  ```
+
+  `会报错：`
+
+  `make[1]: *** [install] Error 1`
+
+  `make[1]: Leaving directory /home/appuser/redis/redis-5.0.5/src`
+
+  `make: *** [install] Error 2`
+
+  改用root账号执行make install
+
+## 单机启动	
+
+```
+cd src
+./redis-server --默认不需要加配置文件
+./redis-cli -p 6379 --默认端口是6379
+```
+
+## 伪集群启动
+
+- 解压完成后，在redis-cluster下新建集群节点
+
+  ```
+  mkdir redis7000
+  cd redis7000
+  mkdir -p data conf log
+  cd ..
+  cp -r ./redis7000  redis7001
+  cp -r ./redis7000  redis7002
+  cp -r ./redis7000  redis7003
+  cp -r ./redis7000  redis7004
+  cp -r ./redis7000  redis7005
+  ```
+
+- 将redis.conf复制到redis7000/conf下，修改配置文件 ：
+
+  ```
+  # 关闭保护模式
+  protected-mode no
+      
+  # 以守护进程后台模式运行
+  daemonize yes
+  
+  #它是集群节点自动维护的文件，主要用于记录集群中有哪些节点、他们的状态以及一些持久化参数等，方便在重启时恢复这些状态。通常是在收到请求之后这个文件就会被更新，去掉注释，默认生成nodes-6379.conf
+  cluster-config-file nodes-7000.conf
+  
+  # 绑定本机ip
+  bind 49.234.27.151
+      
+  # 修改端口
+  port 7000
+      
+  # redis进程文件
+  pidfile /usr/local/redis_cluster/redis7000/redis_7000.pid
+      
+  # 日志文件
+  logfile /usr/local/redis_cluster/redis7000/log/redis_7000.log
+      
+  # 快照数据存放目录,一定是目录
+  dir /usr/local/redis_cluster/redis7000/data/
+      
+  # 启用集群
+  cluster-enabled yes
+  ```
+
+  redis7001~5操作如上，修改对应的参数值。
+
+- 在redis-cluster下启动节点
+
+  ```
+  ./bin/redis-server ./redis7000/conf/redis.conf &
+  ./bin/redis-server ./redis7001/conf/redis.conf &
+  ./bin/redis-server ./redis7002/conf/redis.conf &
+  ./bin/redis-server ./redis7003/conf/redis.conf &
+  ./bin/redis-server ./redis7004/conf/redis.conf &
+  ./bin/redis-server ./redis7005/conf/redis.conf &
+  ```
+
+- 启动集群
+
+  ```
+  /home/appuser/redis/redis-cluster/bin/redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005 --cluster-replicas 1
+  ```
+  
+- 进入对应节点的redis（ -c参数来启动集群模式 ，不然操作报错）
+
+  ```
+  /home/appuser/redis/redis-cluster/bin/redis-cli -c -p 7000
+  ```
+
 # Redis 简介
 
 Redis是一个高性能的 `key-value` 内存数据库。
@@ -474,6 +603,8 @@ redis> APPEND myphone " - 1110"     # 长度从 5 个字符增加到 12 个字�
 redis> GET myphone
 "nokia - 1110"
 ```
+
+
 
 # Redis 订阅发布模式
 
