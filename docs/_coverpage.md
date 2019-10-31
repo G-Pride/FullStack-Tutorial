@@ -1,6 +1,6 @@
 # FullStack Tutorial
 
-> 全栈开发指南，架构师成长之路
+> 全栈开发者指南，架构师成长之路
 
 * Focus on！
 

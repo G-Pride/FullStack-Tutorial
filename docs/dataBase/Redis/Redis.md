@@ -604,7 +604,721 @@ redis> GET myphone
 "nokia - 1110"
 ```
 
+## HASH 哈希
 
+Redis hash 是一个string类型的field和value的映射表，hash特别适合用于存储对象。
+
+Redis 中每个 hash 可以存储 232 - 1 键值对（40多亿）。
+
+### 示例
+
+1. HDEL KEY_NAME FIELD1.. FIELDN
+
+    用于删除哈希表 key 中的一个或多个指定字段，不存在的字段将被忽略 
+
+   ```
+   127.0.0.1:7002> HSET myhash field1 "foo"
+   -> Redirected to slot [9295] located at 127.0.0.1:7001
+   (integer) 1
+   127.0.0.1:7001> HGET myhash field1
+   "foo"
+   127.0.0.1:7001> HDEL myhash field1
+   (integer) 1
+   127.0.0.1:7001> HGET myhash field1
+   (nil)
+   127.0.0.1:7001> HDEL myhash field2
+   (integer) 0
+   ```
+
+2. HEXISTS KEY_NAME FIELD_NAME
+
+    查看哈希表的指定字段是否存在 
+
+   ```
+   127.0.0.1:7001> HEXISTS myhash field1
+   (integer) 0
+   127.0.0.1:7001> HSET myhash field1 "foo"
+   (integer) 1
+   127.0.0.1:7001> HEXISTS myhash field1
+   (integer) 1
+   127.0.0.1:7001> HEXISTS myhash field2
+   (integer) 0
+   ```
+
+3. HGET KEY_NAME FIELD_NAME
+
+    返回哈希表中指定字段的值 
+
+   ```
+   127.0.0.1:7001> HSET myhash field1 "foo"
+   (integer) 1
+   127.0.0.1:7002> HGET myhash field1
+   -> Redirected to slot [9295] located at 127.0.0.1:7001
+   "foo"
+   127.0.0.1:7001> HGET myhash field2
+   (nil)
+   ```
+
+4. HGETALL KEY_NAME
+
+   用于返回哈希表中，所有的字段和值。
+
+   在返回值里，紧跟每个字段名(field name)之后是字段的值(value)，所以返回值的长度是哈希表大小的两倍。
+
+   ```
+   127.0.0.1:7001> HSET myhash field1 "Hello"
+   (integer) 0
+   127.0.0.1:7001> HSET myhash field2 "World"
+   (integer) 1
+   127.0.0.1:7001> HGETALL myhash
+   1) "field1"
+   2) "Hello"
+   3) "field2"
+   4) "World"
+   ```
+
+5. HINCRBY KEY_NAME FIELD_NAME INCR_BY_NUMBER
+
+   用于为哈希表中的字段值加上指定增量值。增量也可以为负数，相当于对指定字段进行减法操作。如果哈希表的 key 不存在，一个新的哈希表被创建并执行 HINCRBY 命令。如果指定的字段不存在，那么在执行命令前，字段的值被初始化为 0 。对一个储存字符串值的字段执行 HINCRBY 命令将造成一个错误。本操作的值被限制在 64 位(bit)有符号数字表示之内。但是不能浮点数加减。
+
+   ```
+   127.0.0.1:7001> HSET myhash field 5
+   (integer) 1
+   127.0.0.1:7001> HGET myhash field
+   "5"
+   127.0.0.1:7000> HINCRBY myhash field 1
+   -> Redirected to slot [9295] located at 127.0.0.1:7001
+   (integer) 6
+   127.0.0.1:7001> HGET myhash field
+   "6"
+   127.0.0.1:7001> HINCRBY myhash field -1
+   (integer) 5
+   127.0.0.1:7001> HGET myhash field
+   "5"
+   ##不存在时
+   127.0.0.1:7001> HEXISTS myhash field3
+   (integer) 0
+   127.0.0.1:7001> HINCRBY myhash field3 1
+   (integer) 1
+   127.0.0.1:7001> HGET myhash field3
+   "1"
+   ##浮点数操作
+   127.0.0.1:7001> HSET myhash field 5
+   (integer) 0
+   127.0.0.1:7001> HINCRBY myhash field 2.5
+   (error) ERR value is not an integer or out of range
+   ```
+
+6. HINCRBYFLOAT key field increment
+
+   用于为哈希表中的字段值加上指定浮点数增量值。如果指定的字段不存在，那么在执行命令前，字段的值被初始化为 0 。
+
+   ```
+   127.0.0.1:7001> HSET myhash field 5.5
+   (integer) 0
+   127.0.0.1:7001> HGET myhash field
+   "5.5"
+   127.0.0.1:7001> HINCRBYFLOAT myhash field 1
+   "6.5"
+   127.0.0.1:7001> HINCRBYFLOAT myhash field -2
+   "4.5"
+   127.0.0.1:7001> HINCRBYFLOAT myhash field -0.5
+   "4"
+   ```
+
+7. HKEYS key
+
+    用于获取哈希表中的所有域（field） 
+
+   ```
+   127.0.0.1:7001> HKEYS myhash
+   1) "field1"
+   2) "field2"
+   3) "field"
+   4) "field3"
+   ```
+
+8. HLEN KEY_NAME 
+
+   用于获取哈希表中字段的数量 
+
+   ```
+   127.0.0.1:7001> HLEN myhash
+   (integer) 4
+   ```
+
+9. HMGET KEY_NAME FIELD1...FIELDN 
+
+   用于返回哈希表中，一个或多个给定字段的值。
+
+   如果指定的字段不存在于哈希表，那么返回一个 nil 值。
+
+   ```
+   127.0.0.1:7001> HKEYS myhash
+   1) "field1"
+   2) "field2"
+   3) "field"
+   4) "field3"
+   127.0.0.1:7001> HLEN myhash
+   (integer) 4
+   127.0.0.1:7001> HMGET myhash field1 field2
+   1) "Hello"
+   2) "World"
+   127.0.0.1:7001> HMGET myhash field1 field2 field4
+   1) "Hello"
+   2) "World"
+   3) (nil)
+   ```
+
+10. HMSET KEY_NAME FIELD1 VALUE1 ...FIELDN VALUEN
+
+    用于同时将多个 field-value (字段-值)对设置到哈希表中。
+
+    此命令会覆盖哈希表中已存在的字段。
+
+    如果哈希表不存在，会创建一个空哈希表，并执行 HMSET 操作。
+
+    ```
+    127.0.0.1:7001> HMSET myhash field4 "good" field5 "luck"
+    OK
+    127.0.0.1:7001> HMGET myhash field4 field5
+    1) "good"
+    2) "luck"
+    ```
+
+11. HSET KEY_NAME FIELD VALUE
+
+    用于为哈希表中的字段赋值 。
+
+    如果哈希表不存在，一个新的哈希表被创建并进行 HSET 操作。
+
+    如果字段已经存在于哈希表中，旧值将被覆盖。
+
+    ```
+    127.0.0.1:7001> HSET myhash field1 "foo"
+    (integer) 0
+    127.0.0.1:7001> HGET myhash field1
+    "foo"
+    ```
+
+12. HSETNX KEY_NAME FIELD VALUE
+
+    用于为哈希表中不存在的的字段赋值 。
+
+    如果哈希表不存在，一个新的哈希表被创建并进行 HSET 操作。
+
+    如果字段已经存在于哈希表中，操作无效。
+
+    如果 key 不存在，一个新哈希表被创建并执行 HSETNX 命令
+
+    ```
+    ##key存在
+    127.0.0.1:7001> HEXISTS myhash field
+    (integer) 1
+    127.0.0.1:7001> HGET myhash field
+    "3.5"
+    127.0.0.1:7001> HSETNX myhash field 5
+    (integer) 0
+    127.0.0.1:7001> HGET myhash field
+    "3.5"
+    ##key不存在
+    127.0.0.1:7001> HEXISTS myhash field6
+    (integer) 0
+    127.0.0.1:7001> HSETNX myhash field6 666
+    (integer) 1
+    127.0.0.1:7001> HGET myhash field6
+    "666"
+    ```
+
+13. HVALS KEY_NAME FIELD VALUE
+
+     返回哈希表所有域(field)的值 
+
+    ```
+    127.0.0.1:7002> HMSET hashkey field1 good  field2 luck
+    -> Redirected to slot [9649] located at 127.0.0.1:7001
+    OK
+    127.0.0.1:7001> HVALS hashkey
+    1) "good"
+    2) "luck"
+    ```
+
+14.  HSCAN key cursor [MATCH pattern] [COUNT count] 
+
+     迭代哈希表中的键值对 
+
+15.  HSTRLEN KEY_NAME FIELD
+
+     返回 hash指定field的value的字符串长度 
+
+    ```
+    127.0.0.1:7001> HGET hashkey field1
+    "good"
+    127.0.0.1:7001> HSTRLEN hashkey field1
+    (integer) 4
+    ```
+
+## List 列表
+
+Redis列表是简单的字符串列表，按照插入顺序排序。你可以添加一个元素导列表的头部（左边）或者尾部（右边）
+
+一个列表最多可以包含 232 - 1 个元素 (4294967295, 每个列表超过40亿个元素)。
+
+### 示例：
+
+1.  LINDEX KEY_NAME INDEX_POSITION
+
+    用法：用于通过索引获取列表中的元素。你也可以使用负数下标，以 -1 表示列表的最后一个元素， -2 表示列			表的倒数第二个元素，以此类推。 
+
+   返回：列表中下标为指定索引值的元素。 如果指定索引值不在列表的区间范围内，返回 nil  
+   
+   ```
+redis 127.0.0.1:6379> LPUSH mylist "World"
+   (integer) 1
+    
+   redis 127.0.0.1:6379> LPUSH mylist "Hello"
+   (integer) 2
+    
+   redis 127.0.0.1:6379> LINDEX mylist 0
+   "Hello"
+    
+   redis 127.0.0.1:6379> LINDEX mylist -1
+   "World"
+    
+   redis 127.0.0.1:6379> LINDEX mylist 3        # index不在 mylist 的区间范围内
+   (nil)
+   ```
+   
+2.  RPUSH KEY_NAME VALUE1..VALUEN 
+
+    用法：用于将一个或多个值插入到列表的尾部(最右边)。如果列表不存在，一个空列表会被创建并执行 RPUSH 			操作。 当列表存在但不是列表类型时，返回一个错误。
+
+    返回： 执行 RPUSH 操作后，列表的长度。 
+
+    ```
+    127.0.0.1:7000> RPUSH mylist1 my
+    (integer) 1
+    127.0.0.1:7000> RPUSH mylist1 name
+    (integer) 2
+    ```
+
+3.  LRANGE KEY_NAME START END 
+
+    用法： 返回列表中指定区间内的元素，区间以偏移量 START 和 END 指定。 其中 0 表示列表的第一个元素， 			1 表示列表的第二个元素，以此类推。 你也可以使用负数下标，以 -1 表示列表的最后一个元素， -2 表			示列表的倒数第二个元素，以此类推。 
+
+    返回： 一个列表，包含指定区间内的元素。 
+
+    ```
+    127.0.0.1:7000> RPUSH mylist my
+    (integer) 3
+    127.0.0.1:7000> RPUSH mylist1 my
+    (integer) 1
+    127.0.0.1:7000> RPUSH mylist1 name
+    (integer) 2
+    127.0.0.1:7000> LRANGE mylist1 0 -1
+    1) "my"
+    2) "name"
+    127.0.0.1:7000> LRANGE mylist1 0 0
+    1) "my"
+    ```
+
+4.  RPOPLPUSH SOURCE_KEY_NAME DESTINATION_KEY_NAME 
+
+    用法： 用于移除列表的最后一个元素，并将该元素添加到另一个列表并返回。 
+
+    返回： 被弹出的元素。 
+
+    ```
+    redis 127.0.0.1:6379> RPUSH mylist "hello"
+    (integer) 1
+    redis 127.0.0.1:6379> RPUSH mylist "foo"
+    (integer) 2
+    redis 127.0.0.1:6379> RPUSH mylist "bar"
+    (integer) 3
+    redis 127.0.0.1:6379> RPOPLPUSH mylist myotherlist
+    "bar"
+    redis 127.0.0.1:6379> LRANGE mylist 0 -1
+    1) "hello"
+    2) "foo"
+    ```
+
+5.  BLPOP LIST1 LIST2 .. LISTN TIMEOUT 
+
+    用法： 移出并获取列表的第一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止。 
+
+    返回： 如果列表为空，返回一个 nil 。 否则，返回一个含有两个元素的列表，第一个元素是被弹出元素所属			的 key ，第二个元素是被弹出元素的值。 
+
+    ```
+    127.0.0.1:7000> LRANGE mylist1 0 -1
+    1) "my"
+    2) "name"
+    127.0.0.1:7000> BLPOP mylist1 10
+    1) "mylist1"
+    2) "my"
+    127.0.0.1:7000> LRANGE mylist1 0 -1
+    1) "name"
+    ```
+
+6.  BRPOP LIST1 LIST2 .. LISTN TIMEOUT 
+
+     用法：移出并获取列表的最后一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为			止。
+
+    返回： 假如在指定时间内没有任何元素被弹出，则返回一个 nil 和等待时长。 反之，返回一个含有两个元素			的列表，第一个元素是被弹出元素所属的 key ，第二个元素是被弹出元素的值。  
+
+    ```
+    127.0.0.1:7000> LPUSH mylist1 her
+    (integer) 2
+    127.0.0.1:7000> LRANGE mylist1 0 -1
+    1) "her"
+    2) "name"
+    127.0.0.1:7000> BRPOP mylist1 10
+    1) "mylist1"
+    2) "name"
+    127.0.0.1:7000> LRANGE mylist1 0 -1
+    1) "her"
+    ```
+
+7.  BRPOPLPUSH LIST1 ANOTHER_LIST TIMEOUT 
+
+    用法：从列表中弹出一个值，将弹出的元素插入到另外一个列表中并返回它； 如果列表没有元素会阻塞列表			直到等待超时或发现可弹出元素为止。
+
+    返回： 假如在指定时间内没有任何元素被弹出，则返回一个 nil 和等待时长。 反之，返回一个含有两个元素			的列表，第一个元素是被弹出元素的值，第二个元素是等待时长。 
+
+    ```
+    # 非空列表
+     
+    redis 127.0.0.1:6379> BRPOPLPUSH msg reciver 500
+    "hello moto"                        # 弹出元素的值
+    (3.38s)                             # 等待时长
+     
+    redis 127.0.0.1:6379> LLEN reciver
+    (integer) 1
+     
+    redis 127.0.0.1:6379> LRANGE reciver 0 0
+    1) "hello moto"
+     
+     
+    # 空列表
+     
+    redis 127.0.0.1:6379> BRPOPLPUSH msg reciver 1
+    (nil)
+    (1.34s)
+    <pre>
+    (nil)
+    (100.06s)
+    ```
+
+8.  LREM KEY_NAME COUNT VALUE 
+
+    用法：根据参数 COUNT 的值，移除列表中与参数 VALUE 相等的元素。
+
+    ​			COUNT 的值可以是以下几种：
+
+    ​			count > 0 : 从表头开始向表尾搜索，移除与 VALUE 相等的元素，数量为 COUNT 。
+
+    ​			count < 0 : 从表尾开始向表头搜索，移除与 VALUE 相等的元素，数量为 COUNT 的绝对值。
+
+    ​			count = 0 : 移除表中所有与 VALUE 相等的值。
+
+    返回： 被移除元素的数量。 列表不存在时返回 0 。 
+
+    ```
+    127.0.0.1:7000> LRANGE mylist1 0 -1
+    1) "18"
+    2) "is"
+    3) "id"
+    4) "age"
+    5) "her"
+    127.0.0.1:7000> LREM mylist1 1 id
+    (integer) 1
+    127.0.0.1:7000> LRANGE mylist1 0 -1
+    1) "18"
+    2) "is"
+    3) "age"
+    4) "her"
+    127.0.0.1:7000> LREM mylist1 2 id
+    (integer) 0
+    127.0.0.1:7000> LRANGE mylist1 0 -1
+    1) "18"
+    2) "is"
+    3) "age"
+    4) "her
+    ```
+
+9.  LLEN KEY_NAME 
+
+    用法： 用于返回列表的长度。 如果列表 key 不存在，则 key 被解释为一个空列表，返回 0 。 如果 key 不是列			表类型，返回一个错误。 
+
+    返回： 列表的长度。 
+
+    ```
+    127.0.0.1:7000> LRANGE mylist1 0 -1
+    1) "18"
+    2) "is"
+    3) "age"
+    4) "her"
+    127.0.0.1:7000> LLEN mylist1
+    (integer) 4
+    ```
+
+10.  LTRIM KEY_NAME START STOP 
+
+    用法：对一个列表进行修剪(trim)，就是说，让列表只保留指定区间内的元素，不在指定区间之内的元素都将			被删除。下标 0 表示列表的第一个元素，以 1 表示列表的第二个元素，以此类推。 你也可以使用负数			下标，以 -1 表示列表的最后一个元素， -2 表示列表的倒数第二个元素，以此类推。
+
+    返回： 命令执行成功时，返回 ok 。 
+
+    ```
+    redis 127.0.0.1:6379> RPUSH mylist "hello"
+    (integer) 1
+    redis 127.0.0.1:6379> RPUSH mylist "hello"
+    (integer) 2
+    redis 127.0.0.1:6379> RPUSH mylist "foo"
+    (integer) 3
+    redis 127.0.0.1:6379> RPUSH mylist "bar"
+    (integer) 4
+    redis 127.0.0.1:6379> LTRIM mylist 1 -1
+    OK
+    redis 127.0.0.1:6379> LRANGE mylist 0 -1
+    1) "hello"
+    2) "foo"
+    3) "bar"
+    ```
+
+11.  Lpop   KEY_NAME 
+
+      用于移除并返回列表的第一个元素。 
+
+     ```
+     127.0.0.1:7000> LRANGE mylist1 0 -1
+     1) "18"
+     2) "is"
+     3) "age"
+     4) "her"
+     127.0.0.1:7000> LPOP mylist1
+     "18"
+     127.0.0.1:7000> LRANGE mylist1 0 -1
+     1) "is"
+     2) "age"
+     3) "her"
+     ```
+
+12.  LPUSHX KEY_NAME VALUE1.. VALUEN 
+
+      用法：将一个或多个值插入到已存在的列表头部，列表不存在时操作无效。 
+
+     返回： 列表的长度 
+
+     ```
+     127.0.0.1:7000> LRANGE mylist1 0 -1
+     1) "18"
+     2) "is"
+     3) "age"
+     4) "her"
+     127.0.0.1:7000> LPUSHX mylist1 !
+     (integer) 5
+     127.0.0.1:7000> LRANGE mylist1 0 -1
+     1) "!"
+     2) "18"
+     3) "is"
+     4) "age"
+     5) "her"
+     127.0.0.1:7000> LPUSHX mylist2 hello
+     -> Redirected to slot [16360] located at 127.0.0.1:7002
+     (integer) 0
+     127.0.0.1:7002> LRANGE mylist2 0 -1
+     (empty list or set)
+     ```
+
+13.  LINSERT KEY_NAME BEFORE EXISTING_VALUE NEW_VALUE 
+
+     用法：用于在列表的元素前或者后插入元素。 当指定元素不存在于列表中时，不执行任何操作。 当列表不存			在时，   被视为空列表，不执行任何操作。 如果 key 不是列表类型，返回一个错误。 
+
+     返回： 如果命令执行成功，返回插入操作完成之后，列表的长度。 如果没有找到指定元素 ，返回 -1 。 如果 			key 不存在或为空列表，返回 0 。 
+
+     ```
+     127.0.0.1:7002> LINSERT mylist1 before her my 
+     -> Redirected to slot [3979] located at 127.0.0.1:7000
+     (integer) 6
+     127.0.0.1:7000> LRANGE mylist1 0 -1
+     1) "!"
+     2) "18"
+     3) "is"
+     4) "age"
+     5) "my"
+     6) "her"
+     127.0.0.1:7000> LINSERT mylist1 after her he 
+     (integer) 7
+     127.0.0.1:7000> LRANGE mylist1 0 -1
+     1) "!"
+     2) "18"
+     3) "is"
+     4) "age"
+     5) "my"
+     6) "her"
+     7) "he"
+     127.0.0.1:7000> LINSERT mylist1 after name guozh
+     (integer) -1
+     127.0.0.1:7000> LINSERT mylist2 after her he 
+     -> Redirected to slot [16360] located at 127.0.0.1:7002
+     (integer) 0
+     ```
+
+14.  RPOP KEY_NAME  
+
+      移除并返回列表的最后一个元素 
+
+     ```
+     127.0.0.1:7002> LRANGE mylist1 0 -1
+     -> Redirected to slot [3979] located at 127.0.0.1:7000
+     1) "!"
+     2) "18"
+     3) "is"
+     4) "age"
+     5) "my"
+     6) "her"
+     7) "he"
+     127.0.0.1:7000> RPOP mylist1
+     "he"
+     127.0.0.1:7000> LRANGE mylist1 0 -1
+     1) "!"
+     2) "18"
+     3) "is"
+     4) "age"
+     5) "my"
+     6) "her"
+     ```
+
+15.  LSET KEY_NAME INDEX VALUE 
+
+     用法：通过索引来设置元素的值。当索引参数超出范围，或对一个空列表进行 LSET 时，返回一个错误。
+
+     返回： 操作成功返回 ok ，否则返回错误信息。 
+
+     ```
+     127.0.0.1:7000> LRANGE mylist1 0 -1
+     1) "18"
+     2) "is"
+     3) "age"
+     4) "my"
+     5) "her"
+     127.0.0.1:7000> lset mylist1 0 28
+     OK
+     127.0.0.1:7000> LRANGE mylist1 0 -1
+     1) "28"
+     2) "is"
+     3) "age"
+     4) "my"
+     5) "her"
+     ```
+
+16.  LPUSH KEY_NAME VALUE1.. VALUEN 
+
+      用法：将一个或多个值插入到列表头部。 如果 key 不存在，一个空列表会被创建并执行 LPUSH 操作。 当 			key 存在但不是列表类型时，返回一个错误。 
+
+     返回： 列表的长度 
+
+     ```
+     redis 127.0.0.1:6379> LPUSH list1 "foo"
+     (integer) 1
+     redis 127.0.0.1:6379> LPUSH list1 "bar"
+     (integer) 2
+     redis 127.0.0.1:6379> LRANGE list1 0 -1
+     1) "foo"
+     2) "bar
+     ```
+
+17.  RPUSHX KEY_NAME VALUE1..VALUEN 
+
+     用法： 将一个或多个值插入到已存在的列表尾部(最右边)。如果列表不存在，操作无效。 
+
+     返回： 列表的长度 
+
+     ```
+     127.0.0.1:7002> LRANGE mylist3 0 -1
+     1) "my"
+     2) "name"
+     3) "is"
+     4) "guozh"
+     127.0.0.1:7002> RPUSHX mylist3 !
+     (integer) 5
+     127.0.0.1:7002> LRANGE mylist3 0 -1
+     1) "my"
+     2) "name"
+     3) "is"
+     4) "guozh"
+     5) "!"
+     127.0.0.1:7002> RPUSHX mylist4 hello
+     -> Redirected to slot [7982] located at 127.0.0.1:7001
+     (integer) 0
+     ```
+
+### 应用场景:
+
+1.取最新N个数据的操作
+
+比如典型的取你网站的最新文章，通过下面方式，我们可以将最新的5000条评论的ID放在Redis的List集合中，并将超出集合部分从数据库获取
+
+- 使用LPUSH latest.comments命令，向list集合中插入数据
+
+- 插入完成后再用LTRIM latest.comments 0 5000命令使其永远只保存最近5000个ID
+
+- 然后我们在客户端获取某一页评论时可以用下面的逻辑（伪代码）
+
+  ```java
+  FUNCTION get_latest_comments(start,num_items):
+    id_list = redis.lrange("latest.comments",start,start+num_items-1)
+    IF id_list.length < num_items
+        id_list = SQL_DB("SELECT ... ORDER BY time LIMIT ...")
+    END
+    RETURN id_list
+  ```
+
+  如果你还有不同的筛选维度，比如某个分类的最新N条，那么你可以再建一个按此分类的List，只存ID的话，Redis是非常高效的。
+
+#### 示例
+
+取最新N个评论的操作
+
+```bash
+127.0.0.1:6379> lpush mycomment 100001
+(integer) 1
+127.0.0.1:6379> lpush mycomment 100002
+(integer) 2
+127.0.0.1:6379> lpush mycomment 100003
+(integer) 3
+127.0.0.1:6379> lpush mycomment 100004
+(integer) 4
+127.0.0.1:6379> LRANGE mycomment 0 -1
+1) "100004"
+2) "100003"
+3) "100002"
+4) "100001"
+127.0.0.1:6379> LTRIM mycomment 0 1
+OK
+127.0.0.1:6379> LRANGE mycomment 0 -1
+1) "100004"
+2) "100003"
+127.0.0.1:6379> lpush mycomment 100005
+(integer) 3
+127.0.0.1:6379> LRANGE mycomment 0 -1
+1) "100005"
+2) "100004"
+3) "100003"
+127.0.0.1:6379> LTRIM mycomment 0 1
+OK
+127.0.0.1:6379> LRANGE mycomment 0 -1
+1) "100005"
+2) "100004"
+127.0.0.1:6379>
+```
+
+## Set 集合
+
+Set 就是一个集合,集合的概念就是一堆不重复值的组合。利用 Redis 提供的 Set 数据结构,可以存储一些集合性的数据。
+
+> 比如在 微博应用中,可以将一个用户所有的关注人存在一个集合中,将其所有粉丝存在一个集合。
+
+因为 Redis 非常人性化的为集合提供了 求交集、并集、差集等操作, 那么就可以非常方便的实现如共同关注、共同喜好、二度好友等功能, 对上面的所有集合操作,你还可以使用不同的命令选择将结果返回给客户端还是存集到一个新的集合中。
 
 # Redis 订阅发布模式
 
@@ -1181,3 +1895,360 @@ OK
 redis 127.0.0.1:6379> SLOWLOG LEN
 (integer) 0
 ```
+
+# Redis 持久化
+
+目前Redis持久化的方式有两种： RDB 和 AOF
+
+首先，我们应该明确持久化的数据有什么用，答案是:
+
+> 用于重启后的数据恢复
+
+Redis是一个内存数据库，无论是RDB还是AOF，都是其保证数据恢复的措施。
+
+所以Redis在利用RDB和AOF进行恢复的时候，都会读取RDB或AOF文件，重新加载到内存中。
+
+### RDB
+
+RDB就是Snapshot快照存储，是默认的持久化方式。 可理解为半持久化模式，
+
+> 即按照一定的策略周期性的将数据保存到磁盘。 对应产生的数据文件为dump.rdb，快照的周期通过配置文件中的save参数来定义。
+
+下面是默认的快照设置：
+
+```
+dbfilename dump.rdb
+# save <seconds> <changes>
+save 900 1    #当有一条Keys数据被改变时，900秒刷新到Disk一次
+save 300 10   #当有10条Keys数据被改变时，300秒刷新到Disk一次
+save 60 10000 #当有10000条Keys数据被改变时，60秒刷新到Disk一次
+```
+
+Redis的RDB文件不会坏掉，因为其写操作是在一个新进程中进行的。 当生成一个新的RDB文件时，Redis生成的子进程会先将数据写到一个临时文件中，然后通过原子性rename系统调用将临时文件重命名为RDB文件。
+
+这样在任何时候出现故障，Redis的RDB文件都总是可用的。
+
+同时，Redis的RDB文件也是Redis主从同步内部实现中的一环。
+
+> 第一次Slave向Master同步的实现是： Slave向Master发出同步请求，Master先dump出rdb文件，然后将rdb文件全量传输给slave，然后Master把缓存的命令转发给Slave，初次同步完成。
+>
+> 第二次以及以后的同步实现是： Master将变量的快照直接实时依次发送给各个Slave。 但不管什么原因导致Slave和Master断开重连都会重复以上两个步骤的过程。
+
+Redis的主从复制是建立在内存快照的持久化基础上的，只要有Slave就一定会有内存快照发生。可以很明显的看到，RDB有它的不足，就是一旦数据库出现问题，那么我们的RDB文件中保存的数据并不是全新的。
+
+从上次RDB文件生成到Redis停机这段时间的数据全部丢掉了。
+
+## AOF（Append-only file）方式
+
+AOF(Append-Only File)比RDB方式有更好的持久化性。
+
+1. 在使用AOF持久化方式时，Redis会将每一个收到的写命令都通过Write函数追加到文件中，类似于MySQL的binlog。
+
+2. 当Redis重启是会通过重新执行文件中保存的写命令来在内存中重建整个数据库的内容。
+
+   > 在Redis重启时会逐个执行AOF文件中的命令来将硬盘中的数据载入到内存中,所以说，载入的速度相较RDB会慢一些
+
+3. 默认情况下,Redis没有开启AOF方式的持久化,可以在redis.conf中通过`appendonly`参数开启:
+
+   ```bash
+    appendonly yes         #启用aof持久化方式
+    # appendfsync always   #每次收到写命令就立即强制写入磁盘，最慢的，但是保证完全的持久化，不推荐使用
+    appendfsync everysec     #每秒钟强制写入磁盘一次，在性能和持久化方面做了很好的折中，推荐
+    # appendfsync no #完全依赖OS的写入，一般为30秒左右一次，性能最好但是持久化最没有保证，不被推荐。
+   ```
+
+4. AOF文件和 RDB文件的保存文件夹位置相同,都是通过dir参数设置的,默认的文件名是`appendonly.aof`,可以通过`appendfilename`参数修改
+
+   ```bash
+    appendfilename appendonly.aof
+   ```
+
+5. AOF的完全持久化方式同时也带来了另一个问题，持久化文件会变得越来越大。
+
+   > 比如: 我们调用`INCR test` 命令100次，文件中就必须保存全部的100条命令，但其实`99`条都是多余的。 因为要恢复数据库的状态其实文件中保存一条`SET test 100`就够了。
+   >
+   > 为了压缩AOF的持久化文件，Redis提供了`bgrewriteaof`命令。收到此命令后Redis将使用与快照类似的方式将内存中的数据以命令的方式保存到临时文件中，最后替换原来的文件，以此来实现控制AOF文件的增长。
+
+   配置redis自动重写AOF文件的参数
+
+   ```bash
+    no-appendfsync-on-rewrite yes   #在AOF重写时，不进行命令追加操作，而只是将其放在缓冲区里，避免与命令的追加造成`DISK IO`上的冲突。
+    auto-aof-rewrite-percentage 100 #当前AOF文件大小是上次日志重写得到AOF文件大小的二倍时，自动启动新的日志重写过程。
+    auto-aof-rewrite-min-size 64mb #当前AOF文件启动新的日志重写过程的最小值，避免刚刚启动Reids时由于文件尺寸较小导致频繁的重写。
+   ```
+
+## 到底选择什么呢？
+
+下面是来自官方的建议：
+
+通常，如果你要想提供很高的数据保障性，那么建议你同时使用两种持久化方式。
+
+> 如果你可以接受灾难带来的几分钟的数据丢失，那么你可以仅使用RDB。
+>
+> 很多用户仅使用了AOF，但是我们建议，既然RDB可以时不时的给数据做个完整的快照，并且提供更快的重启，所以建议也使用RDB。
+
+因此，我们希望可以在未来（长远计划）统一AOF和RDB成一种持久化模式。
+
+在数据恢复方面：RDB的启动时间会更短，原因有两个：
+
+> 一是RDB文件中每一条数据只有一条记录，不会像AOF日志那样可能有一条数据的多次操作记录。所以每条数据只需要写一次就行了。
+>
+> 另一个原因是RDB文件的存储格式和Redis数据在内存中的编码格式是一致的，不需要再进行数据编码工作，所以在CPU消耗上要远小于AOF日志的加载。
+
+二、灾难恢复模拟
+
+既然持久化的数据的作用是用于重启后的数据恢复，那么我们有必要进行一次这样的灾难恢复模拟了。
+
+> 如果数据要做持久化又想保证稳定性，则建议留空一半的物理内存。因为在进行快照的时候，fork出来进行dump操作的子进程会占用与父进程一样的内存，真正的copy-on-write，对性能的影响和内存的耗用都是比较大的。
+
+目前，通常的设计思路是利用`Replication`机制来弥补aof、snapshot性能上的不足，达到了数据可持久化。
+
+> 即Master上Snapshot和AOF都不做，来保证Master的读写性能，而Slave上则同时开启Snapshot和AOF来进行持久化，保证数据的安全性。
+
+首先，修改Master上的如下配置：
+
+```bash
+$ sudo vim /redis/etc/redis.conf
+#save 900 1 #禁用Snapshot
+#save 300 10
+#save 60 10000
+
+appendonly no #禁用(注释)AOF
+```
+
+接着，修改Slave上的如下配置：
+
+```bash
+$ sudo vim /redis/etc/redis.conf
+save 900 1 #启用Snapshot
+save 300 10
+save 60 10000
+
+appendonly yes #启用AOF
+appendfilename appendonly.aof #AOF文件的名称
+# appendfsync always
+appendfsync everysec #每秒钟强制写入磁盘一次
+# appendfsync no  
+
+no-appendfsync-on-rewrite yes   #在日志重写时，不进行命令追加操作
+auto-aof-rewrite-percentage 100 #自动启动新的日志重写过程
+auto-aof-rewrite-min-size 64mb  #启动新的日志重写过程的最小值
+```
+
+分别启动Master与Slave
+
+```bash
+$ redis-server /etc/redis/redis.conf
+```
+
+启动完成后在Master中确认未启动Snapshot参数
+
+```bash
+redis 127.0.0.1:6379> CONFIG GET save
+1) "save"
+2) ""
+```
+
+然后通过以下脚本在Master中生成25万条数据：
+
+```bash
+python@redis:$ cat redis-cli-generate.temp.sh
+#!/bin/bash
+
+REDISCLI="redis-cli -a slavepass -n 1 SET"
+ID=1
+
+while(($ID<50001))
+do
+  INSTANCE_NAME="i-2-$ID-VM"
+  UUID=`cat /proc/sys/kernel/random/uuid`
+  PRIVATE_IP_ADDRESS=10.`echo "$RANDOM % 255 + 1" | bc`.`echo "$RANDOM % 255 + 1" | bc`.`echo "$RANDOM % 255 + 1" | bc`\
+  CREATED=`date "+%Y-%m-%d %H:%M:%S"`
+
+  $REDISCLI vm_instance:$ID:instance_name "$INSTANCE_NAME"
+  $REDISCLI vm_instance:$ID:uuid "$UUID"
+  $REDISCLI vm_instance:$ID:private_ip_address "$PRIVATE_IP_ADDRESS"
+  $REDISCLI vm_instance:$ID:created "$CREATED"
+
+  $REDISCLI vm_instance:$INSTANCE_NAME:id "$ID"
+
+  ID=$(($ID+1))
+done
+python@redis:$ ./redis-cli-generate.temp.sh
+```
+
+在数据的生成过程中，可以很清楚的看到Master上仅在第一次做Slave同步时创建了dump.rdb文件，之后就通过增量传输命令的方式给Slave了。 dump.rdb文件没有再增大。
+
+```bash
+python@redis:/opt/redis/data/6379$ ls -lh
+total 4.0K
+-rw-r--r-- 1 root root 10 Sep 27 00:40 dump.rdb
+```
+
+而Slave上则可以看到dump.rdb文件和AOF文件在不断的增大，并且AOF文件的增长速度明显大于dump.rdb文件。
+
+```bash
+python@redis-slave:$ ls -lh
+total 24M
+-rw-r--r-- 1 root root 15M Sep 27 12:06 appendonly.aof
+-rw-r--r-- 1 root root 9.2M Sep 27 12:06 dump.rdb
+```
+
+等待数据插入完成以后，首先确认当前的数据量。
+
+```bash
+redis 127.0.0.1:6379> info
+...
+...
+
+used_memory:33055824
+used_memory_human:31.52M
+used_memory_rss:34717696
+used_memory_peak:33055800
+used_memory_peak_human:31.52M
+...
+
+# Keyspace
+db0:keys=1,expires=0,avg_ttl=0
+db1:keys=250000,expires=0
+```
+
+当前的数据量为`db0:keys=1 db1:keys=250000`条，占用内存31.52M。
+
+然后我们直接Kill掉Master的Redis进程，模拟灾难。
+
+```bash
+python@redis:$ sudo killall -9 redis-server
+```
+
+我们到Slave中查看状态：
+
+```bash
+redis 127.0.0.1:6379> info
+...
+...
+
+used_memory:33047696
+used_memory_human:31.52M
+used_memory_rss:34775040
+used_memory_peak:33064400
+used_memory_peak_human:31.53M
+...
+
+master_host:10.6.1.143
+master_port:6379
+master_link_status:down
+master_last_io_seconds_ago:-1
+master_sync_in_progress:0
+...
+
+# Keyspace
+db0:keys=1,expires=0,avg_ttl=0
+db1:keys=250000,expires=0
+```
+
+可以看到`master_link_status`的状态已经是down了，Master已经不可访问了。 而此时，Slave依然运行良好，并且保留有AOF与RDB文件。
+
+下面我们将通过Slave上保存好的AOF与RDB文件来恢复Master上的数据。
+
+> 首先，将Slave上的同步状态取消，避免主库在未完成数据恢复前就重启，进而直接覆盖掉从库上的数据，导致所有的数据丢失。
+
+如果Redis服务器已经充当从站命令`SLAVEOF NO ONE` 会关掉复制，转Redis服务器为主
+
+```
+redis 127.0.0.1:6379> SLAVEOF NO ONE
+OK
+```
+
+确认一下已经没有了master相关的配置信息：
+
+```bash
+redis 127.0.0.1:6379> INFO
+...
+role:master
+...
+```
+
+在Slave上复制数据文件：
+
+```bash
+python@redis-slave:$ tar cvf data.tar *
+appendonly.aof
+dump.rdb
+```
+
+将data.tar上传到Master上，尝试恢复数据: 可以看到Master目录下有一个初始化Slave的数据文件，很小，将其删除。
+
+```bash
+python@redis:$ ls -l
+total 4
+-rw-r--r-- 1 root root 10 Sep 27 00:40 dump.rdb
+python@redis:/opt/redis/data/6379$ sudo rm -f dump.rdb
+```
+
+然后解压缩数据文件：
+
+```bash
+python@redis:$ sudo tar xf data.tar
+python@redis:$ ls -lh
+total 29M
+-rw-r--r-- 1 root root 18M Sep 27 01:22 appendonly.aof
+-rw-r--r-- 1 root root 12M Sep 27 01:22 dump.rdb
+```
+
+启动Master上的Redis；
+
+```bash
+python@redis:$ redis-server /etc/redis/redis.conf
+Starting Redis server...
+```
+
+查看数据是否恢复：
+
+```bash
+redis 127.0.0.1:6379> INFO
+...
+db0:...
+db1:keys=250000,expires=0
+```
+
+可以看到25万条数据已经完整恢复到了Master上。 此时，可以放心的恢复Slave的同步设置了
+
+```bash
+redis 127.0.0.1:6379> SLAVEOF 10.6.1.143 6379
+OK
+```
+
+查看同步状态：
+
+```
+redis 127.0.0.1:6379> INFO
+...
+role:slave
+master_host:10.6.1.143
+master_port:6379
+master_link_status:up
+...
+```
+
+## 恢复数据策略
+
+Redis允许同时开启AOF和RDB,既保证了数据安全又使得进行备份等操作十分容易, 那么到底是哪一个文件完成了数据的恢复呢？
+
+实际上，当Redis服务器挂掉时，重启时将按照以下优先级恢复数据到内存：
+
+1. 如果只配置AOF,重启时加载AOF文件恢复数据；
+2. 如果同时 配置了RDB和AOF,启动是只加载AOF文件恢复数据;
+3. 如果只配置RDB,启动是将加载dump文件恢复数据。
+
+也就是说，AOF的优先级要高于RDB，这也很好理解，因为AOF本身对数据的完整性保障要高于RDB。
+
+#### 总结
+
+目前的线上环境中，由于数据都设置有过期时间，采用AOF的方式会不太实用，因为过于频繁的写操作会使AOF文件增长到异常的庞大，大大超过了我们实际的数据量，这也会导致在进行数据恢复时耗用大量的时间。
+
+因此，可以在Slave上仅开启Snapshot来进行本地化，同时可以考虑将save中的频率调高一些或者调用一个计划任务来进行定期bgsave的快照存储，来尽可能的保障本地化数据的完整性。
+
+在这样的架构下，如果仅仅是Master挂掉，Slave完整，数据恢复可达到100%。
+
+如果Master与Slave同时挂掉的话，数据的恢复也可以达到一个可接受的程度。
