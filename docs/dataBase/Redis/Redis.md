@@ -985,8 +985,7 @@ redis 127.0.0.1:6379> LPUSH mylist "World"
     返回： 假如在指定时间内没有任何元素被弹出，则返回一个 nil 和等待时长。 反之，返回一个含有两个元素			的列表，第一个元素是被弹出元素的值，第二个元素是等待时长。 
 
     ```
-    # 非空列表
-     
+    #非空列表
     redis 127.0.0.1:6379> BRPOPLPUSH msg reciver 500
     "hello moto"                        # 弹出元素的值
     (3.38s)                             # 等待时长
@@ -1007,7 +1006,7 @@ redis 127.0.0.1:6379> LPUSH mylist "World"
     (nil)
     (100.06s)
     ```
-
+    
 8.  LREM KEY_NAME COUNT VALUE 
 
     用法：根据参数 COUNT 的值，移除列表中与参数 VALUE 相等的元素。
