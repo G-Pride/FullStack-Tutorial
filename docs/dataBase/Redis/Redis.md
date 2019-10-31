@@ -1314,11 +1314,871 @@ OK
 
 ## Set 集合
 
-Set 就是一个集合,集合的概念就是一堆不重复值的组合。利用 Redis 提供的 Set 数据结构,可以存储一些集合性的数据。
+Set 就是一个集合,集合的概念就是一堆不重复值、无序的组合。利用 Redis 提供的 Set 数据结构,可以存储一些集合性的数据。
 
 > 比如在 微博应用中,可以将一个用户所有的关注人存在一个集合中,将其所有粉丝存在一个集合。
 
 因为 Redis 非常人性化的为集合提供了 求交集、并集、差集等操作, 那么就可以非常方便的实现如共同关注、共同喜好、二度好友等功能, 对上面的所有集合操作,你还可以使用不同的命令选择将结果返回给客户端还是存集到一个新的集合中。
+
+1.  SADD KEY_NAME VALUE1..VALUEN 
+
+   用法：将一个或多个成员元素加入到集合中，已经存在于集合的成员元素将被忽略。假如集合 key 不存在，则创建一个只包含添加的元素作成员的集合。当集合 key 不是集合类型时，返回一个错误。
+
+   返回： 被添加到集合中的新元素的数量，不包括被忽略的元素。 
+
+   ```
+   127.0.0.1:7001> SADD myset hello
+   -> Redirected to slot [560] located at 127.0.0.1:7000
+   (integer) 1
+   127.0.0.1:7000> SADD myset hello redis set
+   (integer) 2
+   ```
+
+2.  SCARD KEY_NAME
+
+   用法： 返回集合中元素的数量 。
+
+   返回： 集合的数量。 当集合 key 不存在时，返回 0 。 
+
+   ```
+   127.0.0.1:7001> SADD myset hello
+   -> Redirected to slot [560] located at 127.0.0.1:7000
+   (integer) 1
+   127.0.0.1:7000> SADD myset hello redis set
+   (integer) 2
+   127.0.0.1:7000> SCARD myset
+   (integer) 3
+   ```
+
+3.  SDIFF FIRST_KEY OTHER_KEY1..OTHER_KEYN 
+
+    用法：返回给定集合之间的差集。不存在的集合 key 将视为空集。 
+
+   返回： 包含差集成员的列表。 
+
+   ```
+   127.0.0.1:7000> SADD {myset} hello redis
+   (integer) 2
+   127.0.0.1:7000> SADD {myset}2 hello world
+   (integer) 2
+   127.0.0.1:7000> SDIFF {myset} {myset}2
+   1) "redis"
+   ```
+
+4.  SDIFFSTORE DESTINATION_KEY KEY1..KEYN  
+
+   用法： 将给定集合之间的差集存储在指定的集合中。如果指定的集合 key 已存在，则会被覆盖。 
+
+   返回： 结果集中的元素数量。 
+
+   ```
+   127.0.0.1:7000> SADD {myset} hello redis
+   (integer) 2
+   127.0.0.1:7000> SADD {myset}2 hello world
+   (integer) 2
+   127.0.0.1:7000> SDIFFSTORE {myset}3 {myset} {myset}2
+   (integer) 1
+   127.0.0.1:7000> SMEMBERS {myset}3
+   1) "redis"
+   ```
+
+5.  SINTER KEY KEY1..KEYN 
+
+   用法：返回给定所有给定集合的交集。 不存在的集合 key 被视为空集。 当给定集合当中有一个空集时，结果也为空集(根据集合运算定律)。 
+
+   返回： 交集成员的列表。 
+
+   ```
+   127.0.0.1:7000> SADD {myset} hello redis
+   (integer) 2
+   127.0.0.1:7000> SADD {myset}2 hello world
+   (integer) 2
+   127.0.0.1:7000> SINTER {myset} {myset}2
+   1) "hello"
+   ```
+
+6.  SINTERSTORE DESTINATION_KEY KEY KEY1..KEYN
+
+   用法： 将给定集合之间的交集存储在指定的集合中。如果指定的集合已经存在，则将其覆盖。 
+
+   返回： 交集成员的列表。 
+
+   ```
+   127.0.0.1:7000> SADD {myset} hello redis
+   (integer) 2
+   127.0.0.1:7000> SADD {myset}2 hello world
+   (integer) 2
+   127.0.0.1:7000> SINTERSTORE {myset}3 {myset} {myset}2
+   (integer) 1
+   127.0.0.1:7000> SMEMBERS {myset}3
+   1) "hello"
+   ```
+
+7.  SISMEMBER KEY VALUE 
+
+   用法： 判断成员元素是否是集合的成员。 
+
+   返回： 如果成员元素是集合的成员，返回 1 。 如果成员元素不是集合的成员，或 key 不存在，返回 0 。 
+
+   ```
+   127.0.0.1:7000> SADD myset4 hello redis and world
+   -> Redirected to slot [16345] located at 127.0.0.1:7002
+   (integer) 4
+   127.0.0.1:7002> SISMEMBER  myset4 hello
+   (integer) 1
+   127.0.0.1:7002> SISMEMBER  myset4 hi
+   (integer) 0
+   ```
+
+8.  SMEMBERS KEY VALUE 
+
+   用法： 返回集合中的所有的成员。 不存在的集合 key 被视为空集合。 
+
+   返回：  集合中的所有成员。 
+
+   ```
+   127.0.0.1:7000> SADD myset4 hello redis and world
+   -> Redirected to slot [16345] located at 127.0.0.1:7002
+   (integer) 4
+   127.0.0.1:7002> SMEMBERS myset4
+   1) "hello"
+   2) "world"
+   3) "redis"
+   4) "and"
+   ```
+
+9.  SMOVE SOURCE DESTINATION MEMBER 
+
+   用法： 将指定成员 member 元素从 source 集合移动到 destination 集合。 
+
+   返回： 如果成员元素被成功移除，返回 1 。 如果成员元素不是 source 集合的成员，并且没有任何操作对 destination 集合执行，那么返回 0 。 
+
+   ```
+   ##成员元素是 source 集合的成员
+   127.0.0.1:7000> SMEMBERS {myset}4
+   1) "world"
+   2) "hello"
+   127.0.0.1:7000> SMEMBERS {myset}5
+   1) "redis"
+   2) "hello"
+   127.0.0.1:7000> SMOVE {myset}4 {myset}5 world
+   (integer) 1
+   127.0.0.1:7000> SMEMBERS {myset}4
+   1) "hello"
+   127.0.0.1:7000> SMEMBERS {myset}5
+   1) "world"
+   2) "redis"
+   3) "hello"
+   ##成员元素不是 source 集合的成员
+   127.0.0.1:7000> SMOVE {myset}4 {myset}5 redis
+   (integer) 0
+   ```
+
+10.  SPOP KEY
+
+     用法：用于移除并返回集合中的一个随机元素。
+
+    返回： 被移除的随机元素。 当集合不存在或是空集时，返回 nil 。 
+
+    ```
+    127.0.0.1:7000> SMEMBERS {myset}5
+     1) "3"
+     2) "1"
+     3) "7"
+     4) "world"
+     5) "2"
+     6) "6"
+     7) "4"
+     8) "8"
+     9) "5"
+    10) "9"
+    127.0.0.1:7000> SPOP {myset}5
+    "1"
+    127.0.0.1:7000>  SMEMBERS {myset}5
+    1) "7"
+    2) "world"
+    3) "2"
+    4) "6"
+    5) "4"
+    6) "8"
+    7) "5"
+    8) "3"
+    9) "9"
+    127.0.0.1:7000> SPOP {myset}5 2
+    1) "5"
+    2) "9"
+    127.0.0.1:7000>  SMEMBERS {myset}5 
+    1) "world"
+    2) "4"
+    3) "6"
+    4) "8"
+    5) "3"
+    6) "7"
+    7) "2"
+    ```
+
+11.  SRANDMEMBER KEY [count] 
+
+    用法：
+
+    - 如果 count 为正数，且小于集合基数，那么命令返回一个包含 count 个元素的数组，数组中的元素各不相同。如果 count 大于等于集合基数，那么返回整个集合。
+    - 如果 count 为负数，那么命令返回一个数组，数组中的元素可能会重复出现多次，而数组的长度为 count 的绝对值。
+
+    该操作和 SPOP 相似，但 SPOP 将随机元素从集合中移除并返回，而 Srandmember 则仅仅返回随机元素，而不对集合进行任何改动。
+
+    返回： 只提供集合 key 参数时，返回一个元素；如果集合为空，返回 nil 。 如果提供了 count 参数，那么返			回一个数组；如果集合为空，返回空数组。 
+
+    ```
+    127.0.0.1:7000> SRANDMEMBER {myset}5 2
+    1) "2"
+    2) "3"
+    127.0.0.1:7000> SRANDMEMBER {myset}5 8
+    1) "8"
+    2) "3"
+    3) "7"
+    4) "world"
+    5) "2"
+    6) "4"
+    7) "6"
+    127.0.0.1:7000> SRANDMEMBER {myset}5 -3
+    1) "8"
+    2) "8"
+    3) "3"
+    ```
+
+12.  SREM KEY MEMBER1..MEMBERN 
+
+    用法：用于移除集合中的一个或多个成员元素，不存在的成员元素会被忽略。当 key 不是集合类型，返回一个			错误。
+
+    返回： 被成功移除的元素的数量，不包括被忽略的元素。 
+
+    ```
+    127.0.0.1:7000> SMEMBERS {myset}5
+    1) "world"
+    2) "4"
+    3) "6"
+    4) "8"
+    5) "3"
+    6) "7"
+    7) "2"
+    127.0.0.1:7000> SREM {myset}5 2 7
+    (integer) 2
+    127.0.0.1:7000> SMEMBERS {myset}5
+    1) "world"
+    2) "4"
+    3) "6"
+    4) "8"
+    5) "3"
+    127.0.0.1:7000> SREM {myset}5 1
+    (integer) 0
+    ```
+
+13.  SUNION KEY KEY1..KEYN 
+
+    用法：返回给定集合的并集。不存在的集合 key 被视为空集。 
+
+    返回： 并集成员的列表。 
+
+    ```
+    127.0.0.1:7000> SADD {myset}6 1 2 3
+    (integer) 3
+    127.0.0.1:7000> SADD {myset}7 3 4 5
+    (integer) 3
+    127.0.0.1:7000> SUNION {myset}6 {myset}7
+    1) "1"
+    2) "2"
+    3) "3"
+    4) "4"
+    5) "5"
+    ```
+
+14.  SUNIONSTORE DESTINATION KEY KEY1..KEYN 
+
+    用法： 将给定集合的并集存储在指定的集合 destination 中。 
+
+    返回： 结果集中的元素数量。 
+
+    ```
+    127.0.0.1:7000> SUNION {myset}6 {myset}7
+    1) "1"
+    2) "2"
+    3) "3"
+    4) "4"
+    5) "5"
+    127.0.0.1:7000> SUNIONSTORE {myset}8 {myset}6 {myset}7
+    (integer) 5
+    127.0.0.1:7000> SMEMBERS {myset}8
+    1) "1"
+    2) "2"
+    3) "3"
+    4) "4"
+    5) "5"
+    ```
+
+15.  SSCAN KEY [MATCH pattern] [COUNT count] 
+
+    用法： 迭代集合键中的元素。 
+
+    返回：  数组列表。 
+
+    ```
+    redis 127.0.0.1:6379> SADD myset1 "hello"
+    (integer) 1
+    redis 127.0.0.1:6379> SADD myset1 "hi"
+    (integer) 1
+    redis 127.0.0.1:6379> SADD myset1 "bar"
+    (integer) 1
+    redis 127.0.0.1:6379> sscan myset1 0 match h*
+    1) "0"
+    2) 1) "hello"
+       2) "h1"
+    ```
+
+## Redis 有序集合(sorted set)
+
+Redis 有序集合和集合一样也是string类型元素的集合,且不允许重复的成员。
+
+不同的是每个元素都会关联一个double类型的分数。redis正是通过分数来为集合中的成员进行从小到大的排序。
+
+有序集合的成员是唯一的,但分数(score)却可以重复。
+
+集合是通过哈希表实现的，所以添加，删除，查找的复杂度都是O(1)。 集合中最大的成员数为 232 - 1 (4294967295, 每个集合可存储40多亿个成员)。
+
+### 示例
+
+1.  ZADD KEY_NAME SCORE1 VALUE1.. SCOREN VALUEN 
+
+   用法：用于将一个或多个成员元素及其分数值加入到有序集当中。如果某个成员已经是有序集的成员，那么更			新这个成员的分数值，并通过重新插入这个成员元素，来保证该成员在正确的位置上。分数值可以是整			数值或双精度浮点数。如果有序集合 key 不存在，则创建一个空的有序集并执行 ZADD 操作。当 key 			存在但不是有序集类型时，返回一个错误。
+
+   返回： 被成功添加的新成员的数量，不包括那些被更新的、已经存在的成员。 
+
+   ```
+   127.0.0.1:7000> ZADD myzset 1 value 2 value2
+   (integer) 2
+   127.0.0.1:7000> ZRANGE myzset 0 -1 WITHSCORES
+   1) "value"
+   2) "1"
+   3) "value2"
+   4) "2"
+   127.0.0.1:7000> ZADD myzset 2 value
+   (integer) 0
+   127.0.0.1:7000> ZRANGE myzset 0 -1 WITHSCORES
+   1) "value"
+   2) "2"
+   3) "value2"
+   4) "2"
+   ```
+
+2.  ZCARD KEY_NAME 
+
+   用法： 用于计算集合中元素的数量。 
+
+   返回： 当 key 存在且是有序集类型时，返回有序集的基数。 当 key 不存在时，返回 0 。 
+
+   ```
+   127.0.0.1:7000> ZRANGE myzset 0 -1 WITHSCORES
+   1) "value"
+   2) "2"
+   3) "value2"
+   4) "2"
+   127.0.0.1:7000> ZCARD myzset
+   (integer) 2
+   ```
+
+3.  ZCOUNT key min max 
+
+   用法： 用于计算有序集合中指定分数区间（闭区间）的成员数量。 
+
+   返回： 分数值在 min 和 max 之间的成员的数量。 
+
+   ```
+   127.0.0.1:7000> ZRANGE myzset 0 -1 WITHSCORES
+   1) "value3"
+   2) "1"
+   3) "value"
+   4) "2"
+   5) "value2"
+   6) "2"
+   127.0.0.1:7000> ZCOUNT myzset 1 2
+   (integer) 3
+   ```
+
+4.  ZINCRBY key increment member 
+
+   用法：对有序集合中指定成员的分数加上增量 increment可以通过传递一个负数值 increment ，让分数减去			相应的值，比如 ZINCRBY key -5 member ，就是让 member 的 score 值减去 5 。当 key 不存在，或			分数不是 key 的成员时， ZINCRBY key increment member 等同于 ZADD key increment member 。			当 key 不是有序集类型时，返回一个错误。分数值可以是整数值或双精度浮点数。
+
+   返回： 成员的新分数值，以字符串形式表示。 
+
+   ```
+   127.0.0.1:7000> ZRANGE myzset 0 -1 WITHSCORES
+   1) "value3"
+   2) "1"
+   3) "value"
+   4) "2"
+   5) "value2"
+   6) "2"
+   127.0.0.1:7000> ZINCRBY myzset 1 value
+   "3"
+   127.0.0.1:7000> ZRANGE myzset 0 -1 WITHSCORES
+   1) "value3"
+   2) "1"
+   3) "value2"
+   4) "2"
+   5) "value"
+   6) "3"
+   127.0.0.1:7000> ZINCRBY myzset -1 value2
+   "1"
+   127.0.0.1:7000> ZRANGE myzset 0 -1 WITHSCORES
+   1) "value2"
+   2) "1"
+   3) "value3"
+   4) "1"
+   5) "value"
+   6) "3"
+   ```
+
+5.  ZINTERSTORE destination numkeys key [key ...] [WEIGHTS weight [weight ...]] [AGGREGATE SUM|MIN|MAX] 
+
+   用法：计算给定的一个或多个有序集的交集，其中给定 key 的数量必须以 numkeys 参数指定，并将该交集(结果集)储存到 destination 。默认情况下，结果集中某个成员的分数值是所有给定集下该成员分数值之和。
+
+   返回： 保存到目标结果集的的成员数量。 
+
+   ```
+   127.0.0.1:7000> ZRANGE {myzset}1 0 -1 WITHSCORES
+   1) "redis"
+   2) "1"
+   3) "mysql"
+   4) "2"
+   5) "oracle"
+   6) "3"
+   127.0.0.1:7000> ZRANGE {myzset}2 0 -1 WITHSCORES
+   1) "redis"
+   2) "2"
+   3) "mysql"
+   4) "3"
+   5) "oracle"
+   6) "4"
+   127.0.0.1:7000> ZINTERSTORE {myzset}3 2 {myzset}2 {myzset}1
+   (integer) 3
+   127.0.0.1:7000> ZRANGE {myzset}3 0 -1 WITHSCORES
+   1) "redis"
+   2) "3"
+   3) "mysql"
+   4) "5"
+   5) "oracle"
+   6) "7"
+   ```
+
+6.  ZLEXCOUNT KEY MIN MAX 
+
+    用法：在计算有序集合中指定字典区间内成员数量。 
+
+    返回：指定区间内的成员数量。 
+
+   ```
+   redis 127.0.0.1:6379> ZADD myzset 0 a 0 b 0 c 0 d 0 e
+   (integer) 5
+   redis 127.0.0.1:6379> ZADD myzset 0 f 0 g
+   (integer) 2
+   redis 127.0.0.1:6379> ZLEXCOUNT myzset - +
+   (integer) 7
+   redis 127.0.0.1:6379> ZLEXCOUNT myzset [b [f
+   (integer) 5
+   ```
+
+7.  ZRANGE key start stop [WITHSCORES] 
+
+   用法：返回有序集中，指定区间内的成员。其中成员的位置按分数值递增(从小到大)来排序。具有相同分数值			的成员按字典序(lexicographical order )来排列。如果你需要成员按值递减(从大到小)来排列，请使用 			[ZREVRANGE](https://www.redis.net.cn/order/8748.html) 命令。下标参数 start 和 stop 都以 0 为底，也就是说，以 0 表示有序集第一个成员，以 			1 表示有序集第二个成员，以此类推。你也可以使用负数下标，以 -1 表示最后一个成员， -2 表示倒数			第二个成员，以此类推。
+
+   返回： 指定区间内，带有分数值(可选)的有序集成员的列表。 
+
+   ```
+   redis 127.0.0.1:6379> ZRANGE salary 0 -1 WITHSCORES             # 显示整个有序集成员
+   1) "jack"
+   2) "3500"
+   3) "tom"
+   4) "5000"
+   5) "boss"
+   6) "10086"
+    
+   redis 127.0.0.1:6379> ZRANGE salary 1 2 WITHSCORES              # 显示有序集下标区间 1 至 2 的成员
+   1) "tom"
+   2) "5000"
+   3) "boss"
+   4) "10086"
+    
+   redis 127.0.0.1:6379> ZRANGE salary 0 200000 WITHSCORES         # 测试 end 下标超出最大下标时的情况
+   1) "jack"
+   2) "3500"
+   3) "tom"
+   4) "5000"
+   5) "boss"
+   6) "10086"
+    
+   redis > ZRANGE salary 200000 3000000 WITHSCORES                  # 测试当给定区间不存在于有序集时的情况
+   (empty list or set)
+   ```
+
+8.  ZRANGEBYLEX key min max [LIMIT offset count] 
+
+    用法：通过字典区间返回有序集合的成员。
+
+   返回： 指定区间内的元素列表。 
+
+   ```
+   redis 127.0.0.1:6379> ZADD myzset 0 a 0 b 0 c 0 d 0 e 0 f 0 g
+   (integer) 7
+   redis 127.0.0.1:6379> ZRANGEBYLEX myzset - [c
+   1) "a"
+   2) "b"
+   3) "c"
+   redis 127.0.0.1:6379> ZRANGEBYLEX myzset - (c
+   1) "a"
+   2) "b"
+   redis 127.0.0.1:6379> ZRANGEBYLEX myzset [aaa (g
+   1) "b"
+   2) "c"
+   3) "d"
+   4) "e"
+   5) "f"
+   ```
+
+9.  ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT offset count] 
+
+   用法：返回有序集合中指定分数区间的成员列表。有序集成员按分数值递增(从小到大)次序排列。
+
+   具有相同分数值的成员按字典序来排列(该属性是有序集提供的，不需要额外的计算)。
+
+   默认情况下，区间的取值使用闭区间 (小于等于或大于等于)，你也可以通过给参数前增加 ( 符号来使用可选的开区间 (小于或大于)。
+
+   举个例子：
+
+   ```
+   ZRANGEBYSCORE zset (1 5
+   ```
+
+   返回所有符合条件 1 `< score <= 5 的成员，而`
+
+   ```
+   ZRANGEBYSCORE zset (5 (10则返回所有符合条件 5 < score < 10 的成员。
+   ```
+
+   返回： 指定区间内，带有分数值(可选)的有序集成员的列表。 
+
+   ```
+   redis 127.0.0.1:6379> ZADD salary 2500 jack                        # 测试数据
+   (integer) 0
+   redis 127.0.0.1:6379> ZADD salary 5000 tom
+   (integer) 0
+   redis 127.0.0.1:6379> ZADD salary 12000 peter
+   (integer) 0
+    
+   redis 127.0.0.1:6379> ZRANGEBYSCORE salary -inf +inf               # 显示整个有序集
+   1) "jack"
+   2) "tom"
+   3) "peter"
+    
+   redis 127.0.0.1:6379> ZRANGEBYSCORE salary -inf +inf WITHSCORES    # 显示整个有序集及成员的 score 值
+   1) "jack"
+   2) "2500"
+   3) "tom"
+   4) "5000"
+   5) "peter"
+   6) "12000"
+    
+   redis 127.0.0.1:6379> ZRANGEBYSCORE salary -inf 5000 WITHSCORES    # 显示工资 <=5000 的所有成员
+   1) "jack"
+   2) "2500"
+   3) "tom"
+   4) "5000"
+   redis 127.0.0.1:6379> ZRANGEBYSCORE salary (5000 400000            # 显示工资大于 5000 小于等于 400000 的成员
+   1) "peter"
+   ```
+
+10.  ZRANK key member 
+
+    用法：返回有序集中指定成员的排名。其中有序集成员按分数值递增(从小到大)顺序排列。 
+
+    返回： 如果成员是有序集 key 的成员，返回 member 的排名。 如果成员不是有序集 key 的成员，返回 nil 。 
+
+    ```
+    127.0.0.1:7000>  ZRANGE {myzset}3 0 -1 WITHSCORES
+    1) "redis"
+    2) "3"
+    3) "mysql"
+    4) "5"
+    5) "oracle"
+    6) "7"
+    127.0.0.1:7000> ZRANK {myzset}3  redis
+    (integer) 0
+    127.0.0.1:7000> ZRANK {myzset}3  mysql
+    (integer) 1
+    ```
+
+11. ZREM  key member 
+
+    用法：用于移除有序集中的一个或多个成员，不存在的成员将被忽略。当 key 存在但不是有序集类型时，返回一个错误。
+
+    返回： 被成功移除的成员的数量，不包括被忽略的成员。 
+
+    ```
+    # 测试数据
+     
+    redis 127.0.0.1:6379> ZRANGE page_rank 0 -1 WITHSCORES
+    1) "bing.com"
+    2) "8"
+    3) "baidu.com"
+    4) "9"
+    5) "google.com"
+    6) "10"
+     
+     
+    # 移除单个元素
+     
+    redis 127.0.0.1:6379> ZREM page_rank google.com
+    (integer) 1
+     
+    redis 127.0.0.1:6379> ZRANGE page_rank 0 -1 WITHSCORES
+    1) "bing.com"
+    2) "8"
+    3) "baidu.com"
+    4) "9"
+     
+     
+    # 移除多个元素
+     
+    redis 127.0.0.1:6379> ZREM page_rank baidu.com bing.com
+    (integer) 2
+     
+    redis 127.0.0.1:6379> ZRANGE page_rank 0 -1 WITHSCORES
+    (empty list or set)
+     
+     
+    # 移除不存在元素
+     
+    redis 127.0.0.1:6379> ZREM page_rank non-exists-element
+    (integer) 0
+    ```
+
+12.  ZREMRANGEBYLEX key min max 
+
+    用法：用于移除有序集合中给定的字典区间的所有成员。 
+
+    返回： 被成功移除的成员的数量，不包括被忽略的成员。 
+
+    ```
+    redis 127.0.0.1:6379> ZADD myzset 0 aaaa 0 b 0 c 0 d 0 e
+    (integer) 5
+    redis 127.0.0.1:6379> ZADD myzset 0 foo 0 zap 0 zip 0 ALPHA 0 alpha
+    (integer) 5
+    redis 127.0.0.1:6379> ZRANGE myzset 0 -1
+    1) "ALPHA"
+     2) "aaaa"
+     3) "alpha"
+     4) "b"
+     5) "c"
+     6) "d"
+     7) "e"
+     8) "foo"
+     9) "zap"
+    10) "zip"
+    redis 127.0.0.1:6379> ZREMRANGEBYLEX myzset [alpha [omega
+    (integer) 6
+    redis 127.0.0.1:6379> ZRANGE myzset 0 -1
+    1) "ALPHA"
+    2) "aaaa"
+    3) "zap"
+    4) "zip"
+    redis> 
+    ```
+
+13.  ZREMRANGEBYRANK key start stop 
+
+    用法： 用于移除有序集中，指定排名(rank)区间（闭区间）内的所有成员。 
+
+    返回： 被移除成员的数量。 
+
+    ```
+    127.0.0.1:7001> ZRANGE myset6 0 -1
+    1) "kafka"
+    2) "java"
+    3) "python"
+    127.0.0.1:7001> ZREMRANGEBYRANK myset6 0 1
+    (integer) 2
+    127.0.0.1:7001> ZRANGE myset6 0 -1
+    1) "python"
+    ```
+
+14.  ZREMRANGEBYSCORE key min max 
+
+     用法：用于移除有序集中，指定分数（score）区间内的所有成员。 
+
+     返回： 被移除成员的数量。 
+
+    ```
+    127.0.0.1:7001> ZRANGE myset6 0 -1 WITHSCORES
+    1) "kafka"
+    2) "3"
+    3) "java"
+    4) "4"
+    5) "python"
+    6) "6"
+    127.0.0.1:7001> ZREMRANGEBYSCORE myset6 3 4
+    (integer) 2
+    127.0.0.1:7001> ZRANGE myset6 0 -1 WITHSCORES
+    1) "python"
+    2) "6"
+    ```
+
+15.  ZREVRANGE key start stop [WITHSCORES] 
+
+    用法：返回有序集中，指定区间内的成员。其中成员的位置按分数值递减(从大到小)来排列。具有相同分数值的成员按字典序的逆序(reverse lexicographical order)排列。除了成员按分数值递减的次序排列这一点外， ZREVRANGE 命令的其他方面和 [ZRANGE](https://www.redis.net.cn/order/8740.html) 命令一样。
+
+    返回： 指定区间内，带有分数值(可选)的有序集成员的列表。 
+
+    ```
+    127.0.0.1:7001> ZRANGE myset6 0 -1 WITHSCORES
+    1) "kafka"
+    2) "3"
+    3) "java"
+    4) "4"
+    5) "python"
+    6) "6"
+    127.0.0.1:7001> ZREVRANGE myset6 0 -1 WITHSCORES
+    1) "python"
+    2) "6"
+    3) "java"
+    4) "4"
+    5) "kafka"
+    6) "3"
+    ```
+
+16.  ZREVRANGEBYSCORE key max min [WITHSCORES] [LIMIT offset count] 
+
+    用法：返回有序集中指定分数区间内的所有的成员。有序集成员按分数值递减(从大到小)的次序排列。具有相同分数值的成员按字典序的逆序(reverse lexicographical order )排列。除了成员按分数值递减的次序排列这一点外， ZREVRANGEBYSCORE 命令的其他方面和 [ZRANGEBYSCORE](https://www.redis.net.cn/order/8742.html) 命令一样。
+
+    返回： 指定区间内，带有分数值(可选)的有序集成员的列表。 
+
+    ```
+    127.0.0.1:7001> ZREVRANGE myset6 0 -1 WITHSCORES
+    1) "python"
+    2) "6"
+    3) "java"
+    4) "4"
+    5) "kafka"
+    6) "3"
+    #特定区间从高到低
+    127.0.0.1:7001> ZREVRANGEBYSCORE myset6 4 3 WITHSCORES
+    1) "java"
+    2) "4"
+    3) "kafka"
+    4) "3"
+    #全部从高到低
+    127.0.0.1:7001> ZREVRANGEBYSCORE myset6 +inf  -inf  WITHSCORES
+    1) "python"
+    2) "6"
+    3) "java"
+    4) "4"
+    5) "kafka"
+    6) "3"
+    ```
+
+17.  ZREVRANK key member 
+
+    用法：返回有序集中成员的排名。其中有序集成员按分数值递减(从大到小)排序。排名以 0 为底，也就是说， 分数值最大的成员排名为 0 。使用 ZRANK 命令可以获得成员按分数值递增(从小到大)排列的排名。
+
+    返回： 如果成员是有序集 key 的成员，返回成员的排名。 如果成员不是有序集 key 的成员，返回 nil 。 
+
+    ```
+    #从低到高
+    127.0.0.1:7001> ZRANGE myset6 0 -1 WITHSCORES
+    1) "kafka"
+    2) "3"
+    3) "java"
+    4) "4"
+    5) "python"
+    6) "6"
+    127.0.0.1:7001> ZRANK myset6 kafka
+    (integer) 0
+    127.0.0.1:7001> ZRANK myset6 python
+    (integer) 2
+    #从高到低
+    127.0.0.1:7001> ZREVRANGE myset6 0 -1 WITHSCORES
+    1) "python"
+    2) "6"
+    3) "java"
+    4) "4"
+    5) "kafka"
+    6) "3"
+    127.0.0.1:7001> ZREVRANK myset6 python
+    (integer) 0
+    127.0.0.1:7001> ZREVRANK myset6 kafka
+    (integer) 2
+    ```
+
+18.  ZSCORE key member 
+
+    用法：返回有序集中，成员的分数值。 如果成员元素不是有序集 key 的成员，或 key 不存在，返回 nil 。 
+
+    返回： 成员的分数值，以字符串形式表示。 
+
+    ```
+    127.0.0.1:7001> ZRANGE myset6 0 -1 WITHSCORES
+    1) "kafka"
+    2) "3"
+    3) "java"
+    4) "4"
+    5) "python"
+    6) "6"
+    127.0.0.1:7001> ZSCORE myset6 python
+    "6"
+    ```
+
+19.  ZUNIONSTORE destination numkeys key [key ...] [WEIGHTS weight [weight ...]] [AGGREGATE SUM|MIN|MAX] 
+
+    用法：计算给定的一个或多个有序集的并集，其中给定 key 的数量必须以 numkeys 参数指定，并将该并集(结果集)储存到 destination 。默认情况下，结果集中某个成员的分数值是所有给定集下该成员分数值之和 。
+
+    返回：保存到 destination 的结果集的成员数量。 
+
+    ```
+    127.0.0.1:7002> ZRANGE {setkey}5 0 -1 WITHSCORES
+    -> Redirected to slot [2440] located at 127.0.0.1:7000
+    1) "java"
+    2) "1"
+    3) "sql"
+    4) "10"
+    5) "oracle"
+    6) "20"
+    127.0.0.1:7000> ZRANGE {setkey}6 0 -1 WITHSCORES
+    1) "java"
+    2) "10"
+    3) "mysql"
+    4) "20"
+    5) "redis"
+    6) "30"
+    #关于权重weight：
+    #如果含有同一个元素，该元素:{setkey}5*2+{setkey}6*3
+    #如果没有含同一个元素:{setkey}5*2、{setkey}6*3
+    127.0.0.1:7000> ZUNIONSTORE {setkey}7 2 {setkey}5 {setkey}6 WEIGHTS 2 3
+    (integer) 5
+    127.0.0.1:7000> ZRANGE {setkey}7 0 -1 WITHSCORES
+     1) "sql"
+     2) "20"
+     3) "java"
+     4) "32"
+     5) "oracle"
+     6) "40"
+     7) "mysql"
+     8) "60"
+     9) "redis"
+    10) "90"
+    ```
+
+20.  ZSCAN key cursor [MATCH pattern] [COUNT count] 
+
+     用法：用于迭代有序集合中的元素（包括元素成员和元素分值）。
+
+     返回： 返回的每个元素都是一个有序集合元素，一个有序集合元素由一个成员（member）和一个分值（score）组成。 
 
 # Redis 订阅发布模式
 
