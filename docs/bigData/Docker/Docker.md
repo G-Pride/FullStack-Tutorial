@@ -243,13 +243,15 @@ sudo usermod -aG docker xxx
 - `volume`：管理 Docker volume，包括查看、创建、删除等；
 - `wait`：阻塞直到一个容器终止，然后输出它的退出符。
 
-## 一张图总结 Docker 的命令
+### 一张图总结 Docker 的命令
 
 ![](.\images\cmd_logic.png)
 
-## 6、应用部署
+## 6、实践
 
-### 6.1Tomcat启动
+[Docker——Nginx安装+SpringBoot部署+端口映射](http://note.youdao.com/noteshare?id=2eda6b43415a6fbd8215e40465b20470&sub=9D2014BC91E141B4B20C674A0D4EA7A6)
+
+### Tomcat启动如下：
 
 从[镜像仓库](https://c.163yun.com/hub#/home)获取tomcat镜像：
 
@@ -292,22 +294,5 @@ docker ps
 
 ```
 docker exec -it 容器id bash
-```
-
-### 6.2 spring boot应用启动
-
-新建文件夹，放入应用war包还有新建Dockerfile文件（vi Dockerfile），内容如下：
-
-```
-FROM java:8 
-VOLUME /tmp 
-ADD jar包名 /jar包名
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/jar包名"]
-```
-
-查看日志
-
-```
-docker logs -f  容器id
 ```
 
