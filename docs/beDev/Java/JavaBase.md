@@ -186,6 +186,8 @@ public class Now {
 ```
 
 ```
+JsonObject jsonObj = (JsonObject) new JsonParser().parse(要解析的json);
+
 JsonObject nowStr = (JsonObject) jsonObj.get("HeWeather6").getAsJsonArray().get(0).getAsJsonObject().get("now");
 
 Now now = new Gson().fromJson(nowStr.toString(), Now.class);
