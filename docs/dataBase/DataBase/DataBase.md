@@ -35,17 +35,71 @@ InnoDB：若一个主键被定义，该主键则作为密集索引；若没有�
 - MyISAM默认用的是表级锁，不支持行级锁
 - InnoDB默认用的是行级锁，也支持表级锁
 
-MyISAM引擎，MyISAM读操作时会给表加表级的读锁（共享锁），写操作时会给表加表级的写锁（排斥锁）：
+**MyISAM引擎，MyISAM读操作时会给表加表级的读锁（共享锁），写操作时会给表加表级的写锁（排斥锁）：**
 
 - 当对一张表的1~10行进行读操作时，同时对这张表的10行以外的数据进行写操作时会被block，直到读操作完成为止。
+
+ 操作命令: 
+
+```
+//加锁
+lock table 表名 read
+
+//解锁
+unlock tables
+```
+
+ 实战场景: 
+
+```
+clientA: 
+    lock table roles write; //写锁
+    select * from roles where id = 1; //查询成功
+    update roles set name = 'admin' where id = 1; //更新成功
+
+clientB: 
+    select * from roles where id = 1; //卡住,等待锁释放
+ClientA:
+    unlock tables; //解锁
+    
+clientB: 
+    select * from roles where id = 1; //查询成功
+```
+
 - 当对一张表的1~10行进行读操作时，同时对这张表的10行以外的数据进行读操作是不会被block。
 
-InnoDB引擎，InnoDB读操作时会给表加行级的读锁（共享锁），写操作时会给表加行级的写锁（排斥锁）：
+ 操作命令: 
+
+```
+//加锁
+lock table 表名 read
+
+//解锁
+unlock tables
+```
+
+ 实战场景: 
+
+```
+clientA: 
+    lock table roles read; //读锁
+    select * from roles where id = 1; //查询成功
+
+clientB: 
+    select * from roles where id = 1; //查询成功
+    update roles set name = 'root'; //卡住,等待锁释放
+    
+ClientA:
+    unlock tables; //解锁
+    
+clientB: 
+    update roles set name = 'root2'; //更新成功
+```
+
+**InnoDB引擎，InnoDB 只有通过索引检索数据，才会使用行锁，否则的话使用表锁 :**
 
 - 当对一张表的1~10行进行读操作时，同时对这张表的10行以外的数据进行写操作时不会被block。
 - 当对一张表的1~10行进行读操作时，同时对这张表的10行以外的数据进行读操作是不会被block；同时对同一行进行读操作时也不会受影响。
-
-*注：InnoDB在sql没有走索引的时候用的是表级锁，走索引的时候是行级锁（对表的第1行不走索引的进行读操作时，同时对第2行进行写操作，会被block）。*
 
 ![](.\images\1574178093(1).jpg)
 
