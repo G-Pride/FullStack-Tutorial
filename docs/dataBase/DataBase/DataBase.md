@@ -151,4 +151,3 @@ X是增删改、for update操作，S是读操作。
   事务隔离级别越高，安全性越高，但是降低了数据库访问的并发度，即通过block保证了数据一致性但是牺牲了数据读取的快捷性。
 
 *注：oracle默认是READ-COMMITTED，mysql默认是REPEATABLE-READ*
-
