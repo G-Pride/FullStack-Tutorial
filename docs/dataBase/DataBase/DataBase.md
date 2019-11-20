@@ -146,4 +146,9 @@ X是增删改、for update操作，S是读操作。
   | 可重复读     | 避免     | 避免 | 避免       | 发生 |
   | 串行化       | 避免     | 避免 | 避免       | 避免 |
 
-  
+  事务隔离级别：READ-UNCOMMITED < READ-COMMITED < REPEATABLE-READ < SERIALIZABLE
+
+  事务隔离级别越高，安全性越高，但是降低了数据库访问的并发度，即通过block保证了数据一致性但是牺牲了数据读取的快捷性。
+
+*注：oracle默认是READ-COMMITTED，mysql默认是REPEATABLE-READ*
+
