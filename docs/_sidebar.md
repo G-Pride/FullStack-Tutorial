@@ -14,7 +14,7 @@
   - Hbase
 - 数据库
   - [Redis](/dataBase/Redis/Redis)
-  - SQL
+  - [数据库原理](/dataBase/DataBase/DataBase)
   - MongoDB
 - 计算机基础
   - [Linux](/algorithm/Linux/Linux)
