@@ -82,9 +82,5 @@
 
 socket通信流程
 
-![](E:\GitHubResp\FullStack-Tutorial\docs\net\http\images\1573195548.jpg)
-
-基于TCP的网络应用程序
-
-基于UDP的网络应用程序
+![](.\images\1573195548.jpg)
 
