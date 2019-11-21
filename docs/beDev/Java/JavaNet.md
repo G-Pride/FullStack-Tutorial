@@ -4,7 +4,7 @@
 
 首先新建TCP服务端
 
-```
+```java
 public class TCPServer {
 	
 	public static void main(String[] args) throws IOException {
@@ -23,7 +23,7 @@ public class TCPServer {
 
 新建业务类 LengthCalculator
 
-```
+```java
 public class LengthCalculator extends Thread{
 
 	private Socket socket;
@@ -58,7 +58,7 @@ public class LengthCalculator extends Thread{
 
 新建TCP客户端
 
-```
+```java
 public class TCPClient {
 	
 	public static void main(String[] args) throws UnknownHostException, IOException {
@@ -93,7 +93,7 @@ public class TCPClient {
 
 新建UDP服务类
 
-```
+```java
 public class UDPServer {
 	public static void main(String[] args) throws Exception {
 		DatagramSocket socket = new DatagramSocket(65001);//监听的端口号
@@ -118,7 +118,7 @@ public class UDPServer {
 
 新建UDP客户端
 
-```
+```java
 public class UDPClient {
 	public static void main(String[] args) throws Exception {
 		//客户端发数据报给服务端
