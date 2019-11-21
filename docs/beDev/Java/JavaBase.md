@@ -67,6 +67,29 @@ public class Test01 {
 
 ClassLoader在java中有着非常重要的作用，它主要工作在class装载的加载阶段，其主要作用是从系统外部获得class二进制数据流，所有的class都是由ClassLoader进行加载的，ClassLoader负责通过将class文件里的二进制数据流装载进系统，然后交给java虚拟机进行连接、初始化等操作。
 
+**loadClass和forName的区别：**
+
+ ![LOACF](images/20190408163015241.png) 
+
+```
+Class.forName(className)方法，内部实际调用的方法是 Class.forName(className,true,classloader); 
+```
+
+第2个boolean参数表示类是否需要初始化， Class.forName(className)默认是需要初始化。
+
+一旦初始化，就会触发目标对象的 static块代码执行，static参数也会被再次初始化。
+
+```
+ClassLoader.loadClass(className)方法，内部实际调用的方法是ClassLoader.loadClass(className,false);
+```
+
+第2个 boolean参数，表示目标对象是否进行链接，false表示不进行链接，由上面介绍可以，不进行链接意味着不进行包括初始化等一些列步骤，那么静态块和静态对象就不会得到执行
+
+Class.forName()除了将类的.class文件加载到JVM中之外，还会对类进行解释，执行类中的static块。
+而classLoader只干一件事情，就是将.class文件加载到JVM中，不会执行static中的内容,只有在newInstance才会去执行static块。
+
+Class.forName(name, initialize, loader)带参函数也可控制是否加载static块。并且只有调用了newInstance()方法才用调用构造函数，创建类的对象。
+
 ## GC 垃圾回收机制
 
 **判断对象是否为垃圾的算法：**
