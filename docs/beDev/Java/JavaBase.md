@@ -278,3 +278,14 @@ JsonObject nowStr = (JsonObject) jsonObj.get("HeWeather6").getAsJsonArray().get(
 
 Now now = new Gson().fromJson(nowStr.toString(), Now.class);
 ```
+
+## 内存模型
+
+线程私有：
+
+- 程序计数器——当前线程所执行的字节码行号指示器；改变计数器的值来选取下一条需要执行的字节码指令；和线程是一对一的关系即“线程私有”；对java方法计数，如果是Native方法则计数器值为undefined；只是记录行号，不会发生内存泄漏的问题。
+- 虚拟机栈——java方法执行的内存模型，每个方法被执行时都会创建一个栈帧，即方法运行期间的基础数据结构
+- 本地方法栈
+
+线程共享：MetaSpace、Java堆
+

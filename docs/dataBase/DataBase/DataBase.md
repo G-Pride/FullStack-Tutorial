@@ -179,3 +179,4 @@ RR隔离级别下：
 - 数据行里的DB_TRX_ID、DB_ROLL_DTR、DB_ROW_ID字段
 - undo日志
 - read view
+
