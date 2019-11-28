@@ -289,3 +289,465 @@ Now now = new Gson().fromJson(nowStr.toString(), Now.class);
 
 线程共享：MetaSpace、Java堆
 
+## 线程
+
+**Thread中run和start方法的区别：**
+
+![image-20191127145224417](images/image-20191127145224417.png)
+
+**Thread和Runnable的关系：**
+
+**Thread实例**
+
+MyThread类
+
+```java
+public class MyThread extends Thread{
+	private String name;
+	public MyThread(String name) {
+		this.name = name;
+	}
+	
+	public void run() {
+		for (int i=0;i<5;i++) {
+			System.out.println("Thread start:"+this.name+i);
+		}
+	}
+}
+```
+
+ThreadDemo类
+
+```java
+public class ThreadDemo {
+	public static void main(String[] args) {
+		MyThread mt1 = new MyThread("gzh");
+		MyThread mt2 = new MyThread("rjy");
+		MyThread mt3 = new MyThread("r&g");
+		System.out.println("调用run方法：");
+		mt1.run();
+		mt2.run();
+		mt3.run();
+		System.out.println("调用start方法：");
+		mt1.start();
+		mt2.start();
+		mt3.start();
+	}
+}
+```
+
+运行结果：可知单独调用run只是普通的方法，start才会去调用线程
+
+```
+调用run方法：
+Thread start:gzh0
+Thread start:gzh1
+Thread start:gzh2
+Thread start:gzh3
+Thread start:gzh4
+Thread start:rjy0
+Thread start:rjy1
+Thread start:rjy2
+Thread start:rjy3
+Thread start:rjy4
+Thread start:r&g0
+Thread start:r&g1
+Thread start:r&g2
+Thread start:r&g3
+Thread start:r&g4
+调用start方法：
+Thread start:gzh0
+Thread start:gzh1
+Thread start:gzh2
+Thread start:gzh3
+Thread start:rjy0
+Thread start:rjy1
+Thread start:rjy2
+Thread start:rjy3
+Thread start:rjy4
+Thread start:r&g0
+Thread start:r&g1
+Thread start:r&g2
+Thread start:r&g3
+Thread start:gzh4
+Thread start:r&g4
+```
+
+**Runable实例**
+
+MyRunable类
+
+```java
+public class MyRunable implements Runnable{
+
+	private String name;
+	public MyRunable(String name) {
+		this.name = name;
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		for (int i=0;i<5;i++) {
+			System.out.println("Thread start:"+this.name+i);
+		}
+	}
+}
+```
+
+RunableDemo类
+
+```java
+public class RunableDemo {
+	public static void main(String[] args) {
+		System.out.println("调用run方法：");
+		MyRunable mr1 = new MyRunable("gzh");
+		MyRunable mr2 = new MyRunable("rjy");
+		MyRunable mr3 = new MyRunable("r&g");
+		//这样只能调用run方法
+		mr1.run();
+		mr2.run();
+		mr3.run();
+		
+		System.out.println("调用start方法：");
+		Thread t1 = new Thread(mr1);
+		Thread t2 = new Thread(mr2);
+		Thread t3 = new Thread(mr3);
+		t1.start();
+		t2.start();
+		t3.start();
+	}
+}
+```
+
+**处理线程的返回值：**
+
+- 主线程等待法：wait（）
+- 使用Thread类的join（）阻塞当前线程以等待子线程处理完毕
+- 通过Callable接口实现，通过Future or 线程池获取
+
+**Future实例**
+
+MyCallable类
+
+```java
+public class MyCallable implements Callable{
+	@Override
+	public Object call() throws Exception {
+		String value = "gzh";
+		System.out.println("ready to work");
+		Thread.currentThread().sleep(5000);
+		System.out.println("task done");
+		return value;
+	}
+}
+```
+
+FutrueTaskDemo类
+
+```java
+public class FutrueTaskDemo {
+	public static void main(String[] args) throws InterruptedException, ExecutionException {
+		FutureTask ft = new FutureTask(new MyCallable());
+		new Thread(ft).start();
+		if(!ft.isDone()) {
+			System.out.println("task has not finally");
+		}
+		System.out.println("task return:"+ft.get());
+	}
+}
+```
+
+运行结果：
+
+```
+task has not finally
+ready to work
+（等待五秒）
+task done
+task return:gzh
+```
+
+**线程池实例**
+
+ThreadPoolDemo类
+
+```java
+public class ThreadPoolDemo {
+	public static void main(String[] args) throws InterruptedException, ExecutionException {
+		ExecutorService newCachedThreadPool = Executors.newCachedThreadPool();
+		Future ft = newCachedThreadPool.submit(new MyCallable());
+		if(!ft.isDone()) {
+			System.out.println("task has not finally");
+		}
+		System.out.println("task return:"+ft.get());
+	}
+}
+```
+
+运行结果：
+
+```
+task has not finally
+ready to work
+（等待五秒）
+task done
+task return:gzh
+```
+
+结论：线程池可以提交多个实现callable方法的类，去让线程池并发的处理结果，方便对执行callable的类统一进行管理。
+
+**线程状态：**
+
+![](images/image-20191128113525953.png)
+
+无限期等待：
+
+![image-20191128112423804](images/image-20191128112423804.png)
+
+限期等待：
+
+![image-20191128112532598](images/image-20191128112532598.png)
+
+**sleep和wait的区别：**
+
+**基本差别：**
+
+- sleep是Thread类的方法，wait是Object类中定义的方法
+- sleep方法可以在任何地方使用
+- wait方法只能在synchronized方法或synchronized块中使用
+
+**本质差别：**
+
+- sleep只会让出CPU，不会导致锁行为的改变
+- wait不仅让出CPU，还会释放出已经占有的同步资源锁
+
+**yield**
+
+当前调用Thread.yield()函数时，会给线程调度器一个当前线程愿意让出CPU使用的暗示，但是线程调度器可能会忽略这个暗示。
+
+实例：
+
+```
+public class YieldDemo {
+	
+	public static void main(String[] args) {
+		Runnable yield = new Runnable() {
+
+			@Override
+			public void run() {
+				for(int i=0;i<10;i++) {
+					System.out.println(Thread.currentThread().getName()+i);
+					if(i==5) {
+						Thread.yield();
+					}
+				}
+				
+			}
+			
+		};
+		Thread t1 = new Thread(yield,"A");
+		Thread t2 = new Thread(yield,"B");
+		t1.start();
+		t2.start();
+	}
+}
+```
+
+运行结果
+
+```
+B0
+A0
+A1
+A2
+A3
+A4
+A5
+B1
+A6
+B2
+A7
+B3
+A8
+A9
+B4
+B5
+B6
+B7
+B8
+B9
+```
+
+**interrupt中断线程：**
+
+- 通过调用stop方法停止线程（太暴力，已被抛弃）
+- 调用interrupt，通知线程应该中断了（目前使用）
+  - 如果线程处于被阻塞状态，那么线程将立即退出被阻塞状态，并抛出InterruptedException异常
+  - 如果线程处于正常活动状态，那么会将该线程的中断标志设置为true。被设置中断标志的线程将继续正常运行，不受影响
+
+中断在java中主要有3个方法，interrupt()，isInterrupted()和interrupted()。
+
+- interrupt()，在一个线程中调用另一个线程的interrupt()方法，即会向那个线程发出信号——线程中断状态已被设置。至于那个线程何去何从，由具体的代码实现决定。
+- isInterrupted()，用来判断当前线程的中断状态(true or false)。
+- interrupted()是个Thread的static方法，用来恢复中断状态。
+
+ **interrupt()不能中断在运行中的线程，它只能改变中断状态而已。** 
+
+```java
+public class InterruptionInJava implements Runnable{
+ 
+    public static void main(String[] args) throws InterruptedException {
+        Thread testThread = new Thread(new InterruptionInJava(),"InterruptionInJava");
+       //start thread,准备开始执行run方法
+        testThread.start();
+       //给程序执行run方法的时间，避免还没执行run方法，就先执行 on = true; 这样while不会执行
+        Thread.sleep(1000);
+        //interrupt thread
+        testThread.interrupt();
+ 
+        System.out.println("main end");
+ 
+    }
+ 
+    @Override
+    public void run() {
+        while(true){
+            if(Thread.currentThread().isInterrupted()){
+                System.out.println("Yes,I am interruted,but I am still running");
+ 
+            }else{
+                System.out.println("not yet interrupted");
+            }
+        }
+    }
+}
+```
+
+运行结果：
+
+```
+  System.out.println("main end");
+  System.out.println("not yet interrupted");
+  .......
+  (1秒后)
+  System.out.println("Yes,I am interruted,but I am still running");
+  .......
+```
+
+ **如何中断线程？答案是添加一个开关**。 
+
+```java
+public class InterruptionInJava implements Runnable{
+    private volatile static boolean on = false;
+    public static void main(String[] args) throws InterruptedException {
+        Thread testThread = new Thread(new InterruptionInJava(),"InterruptionInJava");
+       //start thread,准备开始执行run方法
+        testThread.start();
+        //给程序执行run方法的时间，避免还没执行run方法，就先执行 on = true; 这样while不会执行
+        Thread.sleep(1000);
+        testThread.interrupt();
+        InterruptionInJava.on = true;
+ 
+        System.out.println("main end");
+ 
+    }
+ 
+    @Override
+    public void run() {
+        while(!on){
+            if(Thread.currentThread().isInterrupted()){
+                System.out.println("Yes,I am interruted,but I am still running");
+                //或者在这里添加 return;
+            }else{
+                System.out.println("not yet interrupted");
+            }
+        }
+    }
+}
+```
+
+运行结果：
+
+```
+not yet interrupted
+......
+main end
+Yes,I am interruted,but I am still running
+```
+
+ **但是当遇到线程阻塞时，就会很无奈了，正如下面代码所示：** 
+
+```java
+public class InterruptionInJava implements Runnable{
+    private volatile static boolean on = false;
+    public static void main(String[] args) throws InterruptedException {
+        Thread testThread = new Thread(new InterruptionInJava(),"InterruptionInJava");
+        //start thread,准备开始执行run方法
+        testThread.start();
+       //给程序执行run方法的时间，避免还没执行run方法，就先执行 on = true; 这样while不会执行
+        Thread.sleep(1000);
+        InterruptionInJava.on = true;
+        
+        System.out.println("main end");
+    }
+ 
+    @Override
+    public void run() {
+        while(!on){
+        	try {
+				Thread.sleep(10000000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				System.out.println("caught exception: "+e);
+			}
+        }
+    }
+}
+```
+
+运行结果
+
+```
+main end
+（一直在阻塞）
+```
+
+ **线程被阻塞无法被中断。这时候救世主interrupt函数又回来了，它可以迅速中断被阻塞的线程，抛出一个InterruptedException，把线程从阻塞状态中解救出来 ：**
+
+```java
+public class InterruptionInJava implements Runnable{
+    private volatile static boolean on = false;
+    public static void main(String[] args) throws InterruptedException {
+        Thread testThread = new Thread(new InterruptionInJava(),"InterruptionInJava");
+        //start thread,准备开始执行run方法
+        testThread.start();
+        Thread.sleep(1000);//避免还没执行run方法，就先执行 on = true; 这样while不会执行
+        InterruptionInJava.on = true;
+        testThread.interrupt();
+        System.out.println("main end");
+    }
+ 
+    @Override
+    public void run() {
+        while(!on){
+        	try {
+				Thread.sleep(10000000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				System.out.println("caught exception: "+e);
+			}
+        }
+    }
+}
+```
+
+运行结果
+
+```
+main end
+caught exception: java.lang.InterruptedException: sleep interrupted
+```
+

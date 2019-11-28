@@ -2797,6 +2797,23 @@ Redis的主从复制是建立在内存快照的持久化基础上的，只要有
 
 从上次RDB文件生成到Redis停机这段时间的数据全部丢掉了。
 
+**相关命令：**
+
+save：阻塞redis的服务器进程，直到rdb文件被创建完毕
+
+bgsave：fork出一个子进程来创建rdb文件，实现了copy-on-write，不阻塞服务器进程
+
+lastsave：查看最新的快照生成时间
+
+**自动化触发rdb持久化的方式：**
+
+- 根据redis.conf配置里的save m n定时触发（用的是bdsave）
+- 主从复制时，主节点自动触发
+- 执行debug reload
+- 执行shutdown且没有开启aof持久化
+
+
+
 ## AOF（Append-only file）方式
 
 AOF(Append-Only File)比RDB方式有更好的持久化性。
@@ -2835,6 +2852,15 @@ AOF(Append-Only File)比RDB方式有更好的持久化性。
     auto-aof-rewrite-percentage 100 #当前AOF文件大小是上次日志重写得到AOF文件大小的二倍时，自动启动新的日志重写过程。
     auto-aof-rewrite-min-size 64mb #当前AOF文件启动新的日志重写过程的最小值，避免刚刚启动Reids时由于文件尺寸较小导致频繁的重写。
    ```
+   
+
+**日志重写解决AOF文件大小不断增大的问题，原理如下：**
+
+- 调用fork()，创建一个子进程
+- 子进程把新的AOF写到一个临时文件里，不依赖原来的AOF文件
+- 主进程持续将新的变动同时写到内存和旧的AOF里
+- 主进程获取子进程重写AOF的完成信号，往新的AOF同步增量变动
+- 使用新的AOF文件替换旧的AOF文件
 
 ## 到底选择什么呢？
 

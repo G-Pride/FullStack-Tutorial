@@ -4,7 +4,7 @@
   - Spring Cloud
   - Python
 - 云计算&大数据
-  - Hadoop
+  - Hadoop`
   - [Zookeeper](/bigData/Zookeeper/Zookeeper)
   - [Kafka](/bigData/Kafka/Kafka)
   - [Storm](/bigData/Storm/Storm)
