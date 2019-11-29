@@ -291,13 +291,13 @@ Now now = new Gson().fromJson(nowStr.toString(), Now.class);
 
 ## 线程
 
-**Thread中run和start方法的区别：**
+### **Thread中run和start方法的区别：**
 
 ![image-20191127145224417](images/image-20191127145224417.png)
 
-**Thread和Runnable的关系：**
+### **Thread和Runnable的关系：**
 
-**Thread实例**
+#### **Thread实例**
 
 MyThread类
 
@@ -373,7 +373,7 @@ Thread start:gzh4
 Thread start:r&g4
 ```
 
-**Runable实例**
+#### **Runable实例**
 
 MyRunable类
 
@@ -422,13 +422,13 @@ public class RunableDemo {
 }
 ```
 
-**处理线程的返回值：**
+## **处理线程的返回值：**
 
 - 主线程等待法：wait（）
 - 使用Thread类的join（）阻塞当前线程以等待子线程处理完毕
 - 通过Callable接口实现，通过Future or 线程池获取
 
-**Future实例**
+### **Future实例**
 
 MyCallable类
 
@@ -470,7 +470,7 @@ task done
 task return:gzh
 ```
 
-**线程池实例**
+### **线程池实例**
 
 ThreadPoolDemo类
 
@@ -499,7 +499,7 @@ task return:gzh
 
 结论：线程池可以提交多个实现callable方法的类，去让线程池并发的处理结果，方便对执行callable的类统一进行管理。
 
-**线程状态：**
+## **线程状态：**
 
 ![](images/image-20191128113525953.png)
 
@@ -511,7 +511,7 @@ task return:gzh
 
 ![image-20191128112532598](images/image-20191128112532598.png)
 
-**sleep和wait的区别：**
+## **sleep和wait的区别：**
 
 **基本差别：**
 
@@ -524,9 +524,117 @@ task return:gzh
 - sleep只会让出CPU，不会导致锁行为的改变
 - wait不仅让出CPU，还会释放出已经占有的同步资源锁
 
-**yield**
+## notify 唤醒
 
-当前调用Thread.yield()函数时，会给线程调度器一个当前线程愿意让出CPU使用的暗示，但是线程调度器可能会忽略这个暗示。
+ **锁池和等待池**
+
+- 锁池:假设线程A已经拥有了某个对象(注意:不是类)的锁，而其它的线程想要调用这个对象的某个synchronized方法(或者synchronized块)，由于这些线程在进入对象的synchronized方法之前必须先获得该对象的锁的拥有权，但是该对象的锁目前正被线程A拥有，所以这些线程就进入了该对象的锁池中。
+- 等待池:假设一个线程A调用了某个对象的wait()方法，线程A就会释放该对象的锁后，进入到了该对象的等待池中
+
+ **notify和notifyAll区别：**
+
+- 如果线程调用了对象的 wait()方法，那么线程便会处于该对象的等待池中，等待池中的线程不会去竞争该对象的锁。
+- 当有线程调用了对象的 notifyAll()方法（唤醒所有 wait 线程）或 notify()方法（只随机唤醒一个 wait 线程），被唤醒的的线程便会进入该对象的锁池中，锁池中的线程会去竞争该对象锁。也就是说，调用了notify后只要一个线程会由等待池进入锁池，而notifyAll会将该对象等待池内的所有线程移动到锁池中，等待锁竞争。
+- 优先级高的线程竞争到对象锁的概率大，假若某线程没有竞争到该对象锁，它还会留在锁池中，唯有线程再次调用 wait()方法，它才会重新回到等待池中。而竞争到对象锁的线程则继续往下执行，直到执行完了 synchronized 代码块，它会释放掉该对象锁，这时锁池中的线程会继续竞争该对象锁。
+
+**实例**
+
+MyNotify类
+
+```java
+public class MyNotify extends Thread {
+
+	private String name;
+	private Object obj;
+
+	public MyNotify(String name, Object obj) {
+		this.name = name;
+		this.obj = obj;
+	}
+
+	public void run() {
+		System.out.println(name + " is waiting.");
+
+		try {
+			synchronized (obj) {
+				obj.wait();
+				System.out.println(name + " is wait.");
+			}
+			System.out.println(name + " has been notified.");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+	}
+}
+```
+
+WaitAndNotify类
+
+```java
+public class WaitAndNotify {
+	public static void main(String[] args) {
+		Object obj = new Object();
+		System.out.println(obj);
+		for (int i = 0; i < 5; i++) {
+			MyNotify t = new MyNotify("Thread" + i, obj);
+			t.start();
+		}
+
+		try {
+			TimeUnit.SECONDS.sleep(2);
+			System.out.println("-----Main Thread notify-----");
+			synchronized (obj) {
+				obj.notify();
+			}
+
+			TimeUnit.SECONDS.sleep(2);
+			System.out.println("Main Thread is end.");
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+	}
+}
+```
+
+运行结果
+
+```
+java.lang.Object@1540e19d
+Thread1 is waiting.
+Thread2 is waiting.
+Thread0 is waiting.
+Thread3 is waiting.
+Thread4 is waiting.
+-----Main Thread notify-----
+Thread1 has been notified.
+Main Thread is end.
+ 
+将其中的那个notify换成notifyAll，运行结果：
+Thread0 is waiting.
+Thread1 is waiting.
+Thread2 is waiting.
+Thread3 is waiting.
+Thread4 is waiting.
+-----Main Thread notifyAll-----
+Thread4 has been notified.
+Thread2 has been notified.
+Thread1 has been notified.
+Thread3 has been notified.
+Thread0 has been notified.
+Main Thread is end.
+
+运行环境jdk8，结论：
+notify唤醒一个等待的线程；notifyAll唤醒所有等待的线程。
+```
+
+
+
+## **yield让出CPU**
+
+当前调用Thread.yield()函数时，会给线程调度器一个当前线程愿意让出CPU使用的暗示， 让其他或者自己的线程执行（也就是谁先抢到谁执行） ,但是线程调度器可能会忽略这个暗示。
 
 实例：
 
@@ -538,7 +646,7 @@ public class YieldDemo {
 
 			@Override
 			public void run() {
-				for(int i=0;i<10;i++) {
+				for(int i=0;i<20;i++) {
 					System.out.println(Thread.currentThread().getName()+i);
 					if(i==5) {
 						Thread.yield();
@@ -550,8 +658,10 @@ public class YieldDemo {
 		};
 		Thread t1 = new Thread(yield,"A");
 		Thread t2 = new Thread(yield,"B");
+		Thread t3 = new Thread(yield,"C");
 		t1.start();
 		t2.start();
+		t3.start();
 	}
 }
 ```
@@ -560,28 +670,69 @@ public class YieldDemo {
 
 ```
 B0
+B1
+B2
+B3
+B4
+B5
+C0
+C1
+C2
+C3
+C4
+C5
 A0
 A1
 A2
+C6
 A3
 A4
 A5
-B1
-A6
-B2
-A7
-B3
-A8
-A9
-B4
-B5
 B6
 B7
 B8
 B9
+B10
+B11
+A6
+A7
+A8
+A9
+C7
+A10
+A11
+A12
+A13
+A14
+A15
+A16
+B12
+A17
+C8
+C9
+C10
+C11
+C12
+C13
+A18
+A19
+B13
+C14
+B14
+C15
+C16
+C17
+B15
+B16
+B17
+C18
+B18
+B19
+C19
+
 ```
 
-**interrupt中断线程：**
+## **interrupt中断线程：**
 
 - 通过调用stop方法停止线程（太暴力，已被抛弃）
 - 调用interrupt，通知线程应该中断了（目前使用）
