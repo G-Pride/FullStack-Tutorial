@@ -902,3 +902,64 @@ main end
 caught exception: java.lang.InterruptedException: sleep interrupted
 ```
 
+## 异常
+
+**异常体系**
+
+![image-20191129134611801](images/image-20191129134611801.png)
+
+**Error和Exception的区别**
+
+- Error：程序无法处理的系统错误，编译器不做检查
+- Exception：程序可以处理的异常，捕获后可能恢复
+
+**常见异常**
+
+![image-20191129144101614](images/image-20191129144101614.png)
+
+**try-catch的性能**
+
+- try-catch块影响JVM的优化
+- 异常对象实例需要保存栈快照等信息，开销较大
+
+## 集合
+
+**数据结构考点：**
+
+![image-20191129171155825](images/image-20191129171155825.png)
+
+**算法考点：**
+
+![image-20191129171005388](images/image-20191129171005388.png)
+
+**哪些排序不稳定？**
+
+快排、堆排
+
+**如何优化算法？**
+
+以空间换时间
+
+**JAVA集合框架：**
+
+![image-20191129170720028](images/image-20191129170720028.png)
+
+**List和Set的比较：**
+
+![image-20191129172911445](images/image-20191129172911445.png)
+
+## J.U.C
+
+## IO机制
+
+- BIO——Block-IO：InputStream和Output Stream，Reader和Writer
+
+![image-20191130205148593](images/image-20191130205148593.png)
+
+- NIO——Nonblock-IO：构建多路复用的，同步非阻塞的IO操作
+
+![image-20191130205331832](images/image-20191130205331832.png)
+
+- AIO——Asyhchronous IO：基于事件和回调机制
+
+![image-20191130210639011](images/image-20191130210639011.png)
