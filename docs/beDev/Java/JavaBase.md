@@ -90,6 +90,18 @@ Class.forName()除了将类的.class文件加载到JVM中之外，还会对类�
 
 Class.forName(name, initialize, loader)带参函数也可控制是否加载static块。并且只有调用了newInstance()方法才用调用构造函数，创建类的对象。
 
+## 泛型
+
+- 让我们的数据结构可以放置“任何”数据类型
+
+- 不可以是基本数据类型，只能是类对象
+
+  boolean，byte，char，short，int，long，float，double
+
+- 每个基本数据类型都有对应的包装类
+
+  Boolean，Byte，Character，Short，Int，Long，Float，Double
+
 ## GC 垃圾回收机制
 
 **判断对象是否为垃圾的算法：**
