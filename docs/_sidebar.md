@@ -22,10 +22,10 @@
   - MongoDB
   
 - 计算机基础
-  - [Linux](/algorithm/Linux/Linux)
+  - [Linux](/basic_Computer/Linux/Linux)
   - 操作系统原理
-  - 算法
-  - 数据结构
+  - [算法](/basic_Computer/Algorithm/Algorithm)
+  - [数据结构](/basic_Computer/Data_Structure/dataStructure.md )
   
 - 网络通信
   
