@@ -260,7 +260,7 @@ class Solution {
 }
 ```
 
-Java Stack类常用方法：
+**Java Stack类常用方法：**
 
 -  boolean empty()  测试堆栈是否为空。
 -  Object peek( ) 查看堆栈顶部的对象，但不从堆栈中移除它。 
@@ -272,3 +272,32 @@ Java Stack类常用方法：
 
 - 队列也是一种线性结构
 - 相比数组，队列对应的操作是数组的子集
+- 是一种先进先出的数据结构（First In First Out）
+
+**Java Queue类常用方法：**
+
+- void enqueue（E） 入队
+- E dequeue（） 出队
+- E getFront（）查看队首的元素
+- int getSize（）队列排了多少元素
+- boolean isEmpty（）队列是否为空
+
+## 链表 Linked List
+
+数据存储在“节点”（Node）中
+
+![img](images/1263667-20180419195238738-379614639.png) 
+
+ ![img](images/1263667-20180419203528264-936184515.png) 
+
+
+
+![](images/image-20191203203900596.png)
+
+**在链表头添加元素**
+
+![image-20191203204157981](images/image-20191203204157981.png)
+
+**在链表中间添加元素**
+
+![image-20191203210610860](images/image-20191203210610860.png)
