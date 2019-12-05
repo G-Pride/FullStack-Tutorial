@@ -301,3 +301,45 @@ class Solution {
 **在链表中间添加元素**
 
 ![image-20191203210610860](images/image-20191203210610860.png)
+
+**在链表中删除元素**
+
+![image-20191204100921713](images/image-20191204100921713.png)
+
+## 递归
+
+本质上，将原来的问题，转化为更小的同一问题
+
+代码实例：
+
+```java
+public class Sum {
+	
+	private int sum(int[] arr,int l) {
+		if(arr.length == l) {
+			return 0;//值为6，一般用在主函数结束时，按照程序开发的一般惯例，表示成功完成本函数。
+			//return -1;//值为5，一般用在主函数结束时，按照程序开发的一般惯例，表示成功完成本函数。
+			//return 1;//值为7，一般用在主函数结束时，按照程序开发的一般惯例，表示成功完成本函数。
+		}
+		return arr[l] + sum(arr,l+1);
+	}
+	
+	public static void main(String[] args) {
+		int[] nums = new int[]{3,1,2};
+		System.out.println(new Sum().sum(nums, 0));
+	}
+}
+```
+
+## 二叉树
+
+和链表一样，动态数据结构
+
+```
+class Node{
+	E e;
+	Node left;
+	Node right;
+}
+```
+
