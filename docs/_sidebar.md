@@ -1,11 +1,10 @@
 - 后端开发
 
   - [Java](/beDev/Java/JavaBar)
-  
   - Spring Cloud
+  - Spring Boot
   - Python
   - [Spring](/beDev/Spring/Spring)
-  
 - 云计算&大数据
   - Hadoop`
   - [Zookeeper](/bigData/Zookeeper/Zookeeper)
@@ -15,22 +14,18 @@
   - Spark
   - Kubernetes
   - Hbase
-  
 - 数据库
   - [Redis](/dataBase/Redis/Redis)
   - [数据库原理](/dataBase/DataBase/DataBase)
   - MongoDB
-  
-- 计算机基础
+- 计算机基础&服务器
   - [Linux](/basic_Computer/Linux/Linux)
+  - Nginx
   - 操作系统原理
   - [算法](/basic_Computer/Algorithm/Algorithm)
   - [数据结构](/basic_Computer/Data_Structure/dataStructure.md )
-  
 - 网络通信
-  
-- [计算机网络](/net/http/HttpAndSocket)
-  
+  - [计算机网络](/net/http/HttpAndSocket)
 - 人工智能
   - 区块链
   - 机器学习

@@ -82,3 +82,12 @@
 
 10. **storm ui页面地址：**http://49.234.27.151:8085/index.html
 
+# 入门
+
+​	Apache Storm is a free and open source distributed realtime computation system. Apache Storm makes it easy to reliably process unbounded streams of data, doing for realtime processing what Hadoop did for batch processing. 
+
+​	*Apache Storm是一个免费的开源分布式实时计算系统。Apache Storm使得可靠处理无限数据流变得容易，就像实时处理Hadoop进行批处理一样。* 
+
+​	Apache Storm has many use cases: realtime analytics, online machine learning, continuous computation, distributed RPC, ETL, and more. Apache Storm is fast: a benchmark clocked it at over **a million tuples processed per second per node**. It is scalable, fault-tolerant, guarantees your data will be processed, and is easy to set up and operate. 
+
+​	*Apache Storm有许多用例：实时分析，在线机器学习，连续计算，分布式RPC，ETL等。Apache Storm速度很快：基准测试表明它**每秒可处理每个节点**超过**一百万个元组**。它具有可扩展性，容错性，可确保您的数据将得到处理，并且易于设置和操作。* 

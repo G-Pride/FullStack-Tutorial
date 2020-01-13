@@ -39,7 +39,7 @@ IOC容器的优势：
 
 **Spring Boot的IOC实现方式：**
 
-- 通过@Bean和@Configuration
+- **通过@Bean和@Configuration**
 
   实体类
 
@@ -77,7 +77,7 @@ IOC容器的优势：
   }
   ```
 
-- 通过扫描装配Bean
+- **通过扫描装配Bean**
 
   给实体类加上@Component("person")注解
 
