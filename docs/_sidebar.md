@@ -20,7 +20,7 @@
   - MongoDB
 - 计算机基础&服务器
   - [Linux](/basic_Computer/Linux/Linux)
-  - Nginx
+  - [Nginx](/basic_Computer/Nginx/Nginx)
   - 操作系统原理
   - [算法](/basic_Computer/Algorithm/Algorithm)
   - [数据结构](/basic_Computer/Data_Structure/dataStructure.md )
