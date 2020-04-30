@@ -91,3 +91,12 @@
 ​	Apache Storm has many use cases: realtime analytics, online machine learning, continuous computation, distributed RPC, ETL, and more. Apache Storm is fast: a benchmark clocked it at over **a million tuples processed per second per node**. It is scalable, fault-tolerant, guarantees your data will be processed, and is easy to set up and operate. 
 
 ​	*Apache Storm有许多用例：实时分析，在线机器学习，连续计算，分布式RPC，ETL等。Apache Storm速度很快：基准测试表明它**每秒可处理每个节点**超过**一百万个元组**。它具有可扩展性，容错性，可确保您的数据将得到处理，并且易于设置和操作。* 
+
+# 并行度
+
+一个worker进程执行的是一个topo的子集
+一个worker进程会启动1..n个executor线程来执行一个topo的component
+一个运行的topo就是由集群中多台物理机上的多个worker进程组成
+
+executor是一个被worker进程启动的单独线程，每个executor只会运行1个topo的一个component
+task是最终运行spout或者bolt代码的最小执行单元

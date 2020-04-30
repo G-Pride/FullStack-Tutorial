@@ -1,10 +1,12 @@
 # Java并发编程
 
-Java 提供了三种创建线程的方法：
+Java 提供了两种创建线程的方法：
 
 - 通过实现 Runnable 接口；
+
 - 通过继承 Thread 类本身；
-- 通过 Callable 和 Future 创建线程。
+
+  另外还有外在表现形式：通过 Callable 和 Future 创建线程。
 
 **实例场景：根据行政区名称获取对应的Redis基站数**
 

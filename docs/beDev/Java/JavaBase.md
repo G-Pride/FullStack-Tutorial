@@ -977,3 +977,32 @@ caught exception: java.lang.InterruptedException: sleep interrupted
 - AIO——Asyhchronous IO：基于事件和回调机制
 
 ![image-20191130210639011](images/image-20191130210639011.png)
+
+## ==和equals区别
+
+**== 解读**
+
+对于基本类型和引用类型，== 的作用效果是不同的，如下所示：
+
+- 基本类型：比较的是值是否相同 （byte，short，char，int，float，double，long，boolean） ；
+- 引用类型：比较的是引用是否相同；
+
+ **equals 解读** 
+
+String类型：
+
+![img](images/20180823172902306.png) 
+
+代码实例：
+
+```
+String x = "string";
+String y = "string";
+String z = new String("string");
+
+System.out.println(x==y);// true
+System.out.println(x==z); // false
+System.out.println(x.equals(y));// true
+System.out.println(x.equals(z)); // true
+```
+

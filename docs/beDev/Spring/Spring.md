@@ -81,7 +81,7 @@ IOC容器的优势：
 
   给实体类加上@Component("person")注解
 
-  给启动类加上@ComponentScan（@SpringBootApplication注解已包含@ComponentScan）
+  *给启动类加上@ComponentScan（@SpringBootApplication注解已包含@ComponentScan）*
 
 **Spring Bean的作用域：**
 
