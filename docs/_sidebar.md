@@ -1,6 +1,6 @@
 - 后端开发
 
-  - [Java](/beDev/Java/JavaBar)
+  - [Java](/后端/Java/JavaBar)
   - Spring Cloud
   - Spring Boot
   - Python
