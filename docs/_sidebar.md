@@ -15,7 +15,7 @@
   - Kubernetes
   - Hbase
   - Flume
-  - ELK
+  - Elastic Stack
   - ETL
 - 数据库
   - [Redis](/dataBase/Redis/Redis)
