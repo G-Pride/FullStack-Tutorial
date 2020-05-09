@@ -6,7 +6,7 @@
 
 TCP 位于 TCP/IP协议族 的传输层，如图所示：
 
-![img](https://mmbiz.qpic.cn/mmbiz_png/FSqlFr4AZkyw8eEQkibtPme7iaoL8zibUrwibUaHqPiayeAM1sdVwlZG79umnXvCPF5RdWdBYNRPweUShZibfaqGWZjA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![img](images/640-1589009548205.webp)
 
 传输层的功能是负责两台计算机之间的数据传输，也就是 **发送** 跟 **接收** 能力，“三次握手”（如下图）也就是围绕着这两点来展开。
 
@@ -30,21 +30,20 @@ TCP 位于 TCP/IP协议族 的传输层，如图所示：
 
 有A跟B，两人为了确定自己手机的【发送】跟【接收】功能是否正常，需要经过以下三次确认：
 
-***\*第一次握手\****：A发送了一条信息（seq=x），在B回复之前，A对自己的发送跟接收是未知，他只知道自己发出去了，但是B收到没他不清楚；但是至少B知道自己的接收功能是正常的。
+**第一次握手**：A发送了一条信息（seq=x），在B回复之前，A对自己的发送跟接收是未知，他只知道自己发出去了，但是B收到没他不清楚；但是至少B知道自己的接收功能是正常的。
 
 ![img](images/640.png)
 
-**第二次\**握手\****：B向A发了短信（seq=y），顺带A之前的信息（ack=x+1）一起传了过去，至此，A知道了自己的发送跟接收是没问题的了；为了让B知道他自己的发送功能没问题，A还需要回复短信（seq=x+1），顺带B发过来的信息（seq
+**第二次握手**：B向A发了短信（seq=y），顺带A之前的信息（ack=x+1）一起传了过去，至此，A知道了自己的发送跟接收是没问题的了；为了让B知道他自己的发送功能没问题，A还需要回复短信（seq=x+1），顺带B发过来的信息（seq
 
 =y）。
 
-![img](https://mmbiz.qpic.cn/mmbiz_png/FSqlFr4AZkyw8eEQkibtPme7iaoL8zibUrw01GKVQkYsPe6rJbEnLZmaIJiaAyP7Ip1cUQg6rVTgLuicYbiausplC5oQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![img](images/640-1589009557180.webp)
 
-**第三次\**握手\****：B收到A的回复（seq=x+1）后，看到了他发给A的消息（ack=y+1）也带过来了，那说明他之前的发送功能是正常的。
+**第三次握手**：B收到A的回复（seq=x+1）后，看到了他发给A的消息（ack=y+1）也带过来了，那说明他之前的发送功能是正常的。
 
-![img](https://mmbiz.qpic.cn/mmbiz_png/FSqlFr4AZkyw8eEQkibtPme7iaoL8zibUrwpd3pRmHzeYOqrUPg6MxrjhyDsl60ia46kyCc8qAmhgBerOiaWJPQrTvA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![img](images/640-1589009559321.webp)
 
 **总结**：“三次握手”的过程也就是**发送端**跟**接收端**确认双方**发送**跟**接收**功能是否正常的过程。
 
 
- 
