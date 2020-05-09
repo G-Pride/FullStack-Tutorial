@@ -28,7 +28,7 @@
   - [算法](/basic_Computer/Algorithm/Algorithm)
   - [数据结构](/basic_Computer/Data_Structure/dataStructure.md )
 - 网络通信
-  - [计算机网络](/net/http/HttpAndSocket)
+  - [计算机网络]( /计算机网络/计算机网络.md )
 - 人工智能
   - 区块链
   - 机器学习
